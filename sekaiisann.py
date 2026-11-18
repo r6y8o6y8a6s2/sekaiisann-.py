@@ -303,7 +303,7 @@ if st.session_state.current_q < len(active_quiz):
             if st.button(option, key=f"opt_{i}", use_container_width=True, disabled=st.session_state.answered):
                 st.session_state.answered = True
                 st.session_state.selected_option = option
-                if option == q["answer"]:
+                if option[:1] == q["answer"][:1]:
                     st.session_state.score += 1
                 st.rerun()
 
