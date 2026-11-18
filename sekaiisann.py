@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import random
 import re
+import time
 from datetime import datetime
 
 # ページ設定
@@ -18,6 +19,7 @@ st.markdown("""
     .incorrect-box { padding: 15px; border-radius: 8px; background-color: #f8d7da; color: #842029; margin-bottom: 10px; }
     .explanation-box { padding: 15px; border-radius: 8px; background-color: #cfe2ff; color: #084298; margin-bottom: 15px; }
     .trivia-box { padding: 15px; border-radius: 8px; background-color: #fff3cd; color: #664d03; margin-bottom: 20px; border-left: 5px solid #ffc107; }
+    .flashcard { padding: 30px; border-radius: 12px; background-color: #f8f9fa; border: 2px solid #dee2e6; text-align: center; margin-bottom: 20px; }
     </style>
 """, unsafe_allow_html=True)
 
@@ -184,7 +186,7 @@ QUIZ_DATA = [
         "id": 15,
         "category": "🌲 自然遺産",
         "difficulty": "標準",
-        "question": "奄美大島、徳之島、沖縄島北部及び西表島が自然遺産に登録された最大の要因はどれか。",
+        "question": "奄美大島、徳之島、沖縄島北部及び西表島が自然遺産に登録された最大の要因は何か。",
         "options": ["① 固有種・絶滅危惧種", "② 日本最大のサンゴ礁", "③ 世界一の年間降水量", "④ 完全な無人島であること"],
         "answer": "① 固有種・絶滅危惧種",
         "explanation": "アマミノクロウサギなど高い固有種・絶滅危惧種の生息地であることが評価されました。",
@@ -398,8 +400,8 @@ def prepare_quiz_session(questions_list):
     return prepared
 
 # --- セッション状態の初期化 ---
-if "game_started" not in st.session_state:
-    st.session_state.game_started = False
+if "app_mode" not in st.session_state:
+    st.session_state.app_mode = "home" # "home", "quiz", "flashcard"
 if "shuffled_quiz" not in st.session_state:
     st.session_state.shuffled_quiz = []
 if "current_q" not in st.session_state:
@@ -416,44 +418,57 @@ if "bookmarked_ids" not in st.session_state:
     st.session_state.bookmarked_ids = set()
 if "history" not in st.session_state:
     st.session_state.history = []
+if "category_mistakes" not in st.session_state:
+    st.session_state.category_mistakes = {} # 分野ごとの間違い回数トラッキング
 if "mode_label" not in st.session_state:
     st.session_state.mode_label = ""
 if "quiz_results_log" not in st.session_state:
-    st.session_state.quiz_results_log = [] # 全問レビュー用ログ
+    st.session_state.quiz_results_log = []
+if "flashcard_index" not in st.session_state:
+    st.session_state.flashcard_index = 0
+if "flashcard_flipped" not in st.session_state:
+    st.session_state.flashcard_flipped = False
 
 # ==========================================
-# サイドバー（学習ダッシュボード ＆ グラフ）
+# サイドバー（学習ダッシュボード ＆ 弱点分析グラフ）
 # ==========================================
 st.sidebar.title("📊 学習ダッシュボード")
 st.sidebar.markdown("---")
 
-if st.session_state.game_started:
+if st.session_state.app_mode == "quiz":
     total_q = len(st.session_state.shuffled_quiz)
     current_progress = st.session_state.current_q
     st.sidebar.metric(label="現在の進捗", value=f"{current_progress} / {total_q} 問")
     st.sidebar.progress(current_progress / total_q if total_q > 0 else 0)
     st.sidebar.markdown(f"**現在のスコア:** {st.session_state.score} 点")
 else:
-    st.sidebar.info("クイズをスタートすると、リアルタイムの進捗が表示されます。")
+    st.sidebar.info("ホーム画面です。")
 
 st.sidebar.markdown("---")
-st.sidebar.subheader("📈 過去の成績推移（正答率）")
+st.sidebar.subheader("📈 成績推移（正答率）")
 if len(st.session_state.history) > 0:
     df_hist = pd.DataFrame(st.session_state.history)
     st.sidebar.line_chart(df_hist.set_index("回数")["正答率(%)"])
-    st.sidebar.caption(f"挑戦回数: {len(st.session_state.history)}回 / ブックマーク: {len(st.session_state.bookmarked_ids)}問")
 else:
-    st.sidebar.caption("まだ学習履歴がありません。")
+    st.sidebar.caption("まだ履歴がありません。")
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("⚠️ 分野別・弱点分析")
+if len(st.session_state.category_mistakes) > 0:
+    df_mistakes = pd.DataFrame(list(st.session_state.category_mistakes.items()), columns=["分野", "ミス回数"])
+    st.sidebar.bar_chart(df_mistakes.set_index("分野"))
+    st.sidebar.caption("※ミスが多い分野を重点的に復習しましょう！")
+else:
+    st.sidebar.caption("クイズを解くと弱点グラフが表示されます。")
 
 # タイトル
 st.markdown('<h2 style="font-size: 1.8rem;">🏛️ 世界遺産検定 4択マスター</h2>', unsafe_allow_html=True)
 st.markdown("---")
 
 # ==========================================
-# 1. モード選択・ホーム画面（トリビア付き）
+# 1. ホーム画面（トリビア付き ＆ モード選択）
 # ==========================================
-if not st.session_state.game_started:
-    # 機能3：今日の世界遺産トリビアの表示
+if st.session_state.app_mode == "home":
     if "daily_trivia" not in st.session_state:
         st.session_state.daily_trivia = random.choice(QUIZ_DATA)
     
@@ -465,7 +480,22 @@ if not st.session_state.game_started:
         </div>
     """, unsafe_allow_html=True)
 
-    st.subheader("🎯 学習モード＆条件を選択")
+    st.subheader("🎯 学習メニューを選択")
+    
+    # メニュー切り替え用タブ的ボタン
+    col_m1, col_m2 = st.columns(2)
+    with col_m1:
+        if st.button("🚀 クイズモードで挑戦", type="primary", use_container_width=True):
+            pass # デフォルトで下にクイズ設定
+    with col_m2:
+        if st.button("📇 暗記カード（一問一答）", use_container_width=True):
+            st.session_state.app_mode = "flashcard"
+            st.session_state.flashcard_index = 0
+            st.session_state.flashcard_flipped = False
+            st.rerun()
+
+    st.markdown("---")
+    st.subheader("⚙️ クイズの出題条件設定")
     
     col_f1, col_f2 = st.columns(2)
     with col_f1:
@@ -501,7 +531,7 @@ if not st.session_state.game_started:
             
             random.shuffle(filtered_data)
             st.session_state.shuffled_quiz = prepare_quiz_session(filtered_data[:limit])
-            st.session_state.game_started = True
+            st.session_state.app_mode = "quiz"
             st.session_state.mode_label = "通常モード"
             st.session_state.current_q = 0
             st.session_state.score = 0
@@ -519,7 +549,7 @@ if not st.session_state.game_started:
             review_list = st.session_state.wrong_questions.copy()
             random.shuffle(review_list)
             st.session_state.shuffled_quiz = prepare_quiz_session(review_list)
-            st.session_state.game_started = True
+            st.session_state.app_mode = "quiz"
             st.session_state.mode_label = "🔄 間違い復習モード"
             st.session_state.current_q = 0
             st.session_state.score = 0
@@ -535,7 +565,7 @@ if not st.session_state.game_started:
             bm_list = [q for q in QUIZ_DATA if q["id"] in st.session_state.bookmarked_ids]
             random.shuffle(bm_list)
             st.session_state.shuffled_quiz = prepare_quiz_session(bm_list)
-            st.session_state.game_started = True
+            st.session_state.app_mode = "quiz"
             st.session_state.mode_label = "⭐ ブックマーク復習モード"
             st.session_state.current_q = 0
             st.session_state.score = 0
@@ -546,9 +576,67 @@ if not st.session_state.game_started:
             st.rerun()
 
 # ==========================================
-# 2. クイズプレイ中の画面（制限時間タイマー付き）
+# 2. 暗記カード（フラッシュカード）モード
 # ==========================================
-else:
+elif st.session_state.app_mode == "flashcard":
+    st.subheader("📇 暗記カードモード（一問一答）")
+    st.caption("ボタンを押して答えや解説を確認しながら、重要知識をインプットしましょう！")
+    
+    fc_list = QUIZ_DATA
+    idx = st.session_state.flashcard_index
+    card = fc_list[idx]
+    
+    st.markdown(f"**カード {idx+1} / {len(fc_list)}** | 分野: `{card['category']}`")
+    
+    # 暗記カードのデザイン表示
+    if not st.session_state.flashcard_flipped:
+        st.markdown(f"""
+            <div class="flashcard">
+                <h3>❓ 問題・遺産</h3>
+                <p style="font-size: 1.2em; font-weight: bold; margin-top: 20px;">{card['question']}</p>
+                <p style="color: #6c757d; margin-top: 30px;">（下のボタンを押すと答えが表示されます）</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🔄 答えを見る（ひっくり返す）", type="primary", use_container_width=True):
+            st.session_state.flashcard_flipped = True
+            st.rerun()
+    else:
+        st.markdown(f"""
+            <div class="flashcard" style="background-color: #e8f4f8;">
+                <h3>🎉 正解・解説</h3>
+                <p style="font-size: 1.2em; font-weight: bold; color: #0f5132; margin-top: 15px;">正解: {card['answer']}</p>
+                <p style="margin-top: 15px;"><b>解説:</b> {card['explanation']}</p>
+                <p style="margin-top: 10px; font-size: 0.9em; color: #084298;">📌 {card['tag']}</p>
+                <p style="color: #6c757d; margin-top: 15px; font-style: italic;">💡 トリビア: {card['trivia']}</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🔄 問題に戻る", use_container_width=True):
+            st.session_state.flashcard_flipped = False
+            st.rerun()
+            
+    st.write("")
+    col_c1, col_c2, col_c3 = st.columns(3)
+    with col_c1:
+        if st.button("⬅️ 前のカード", use_container_width=True):
+            st.session_state.flashcard_index = (idx - 1) % len(fc_list)
+            st.session_state.flashcard_flipped = False
+            st.rerun()
+    with col_c2:
+        if st.button("🏠 ホームに戻る", use_container_width=True):
+            st.session_state.app_mode = "home"
+            st.rerun()
+    with col_c3:
+        if st.button("次のカード ➡️", use_container_width=True):
+            st.session_state.flashcard_index = (idx + 1) % len(fc_list)
+            st.session_state.flashcard_flipped = False
+            st.rerun()
+
+# ==========================================
+# 3. クイズプレイ中の画面（自動カウントダウンタイマー付き）
+# ==========================================
+elif st.session_state.app_mode == "quiz":
     active_quiz = st.session_state.shuffled_quiz
     
     if st.session_state.mode_label != "通常モード":
@@ -557,9 +645,39 @@ else:
     if st.session_state.current_q < len(active_quiz):
         q = active_quiz[st.session_state.current_q]
         
-        # 機能1：タイマー表示（Streamlitの仕様上、未回答時にサクッと動かす簡易タイマー演出）
-        st.markdown("⏱️ **制限時間目安: 20秒**")
+        # --- 本格カウントダウンタイマーの仕組み ---
+        TIMELIMIT = 20  # 制限時間20秒
+        if "start_time" not in st.session_state or st.session_state.get("current_q_tracked") != st.session_state.current_q:
+            st.session_state.start_time = time.time()
+            st.session_state.current_q_tracked = st.session_state.current_q
+            
+        elapsed = int(time.time() - st.session_state.start_time)
+        remaining = max(0, TIMELIMIT - elapsed)
         
+        # 時間切れの自動判定
+        if remaining == 0 and not st.session_state.answered:
+            st.session_state.answered = True
+            st.session_state.selected_option = "時間切れ（未回答）"
+            # 不正解扱いとしてカウント・記録
+            orig_q = next((item for item in QUIZ_DATA if item["id"] == q["id"]), q)
+            if orig_q not in st.session_state.wrong_questions:
+                st.session_state.wrong_questions.append(orig_q)
+            st.session_state.category_mistakes[q['category']] = st.session_state.category_mistakes.get(q['category'], 0) + 1
+            
+            st.session_state.quiz_results_log.append({
+                "question": q["question"],
+                "user_answer": "時間切れ",
+                "correct_answer": q["answer"],
+                "is_correct": False,
+                "explanation": q["explanation"]
+            })
+            st.warning("⏰ 制限時間（20秒）が終了しました！自動的に不正解となります。")
+            st.rerun()
+
+        # タイマー表示バー
+        st.markdown(f"⏱️ **制限時間残り: {remaining}秒 / 20秒**")
+        st.progress(remaining / TIMELIMIT)
+
         top_col1, top_col2 = st.columns([3, 1])
         with top_col1:
             st.markdown(f"### `{q['category']}` | 難易度: **{q['difficulty']}**")
@@ -592,8 +710,9 @@ else:
                         orig_q = next((item for item in QUIZ_DATA if item["id"] == q["id"]), q)
                         if orig_q not in st.session_state.wrong_questions:
                             st.session_state.wrong_questions.append(orig_q)
+                        # 弱点分析用にカテゴリ別ミス回数を加算
+                        st.session_state.category_mistakes[q['category']] = st.session_state.category_mistakes.get(q['category'], 0) + 1
                     
-                    # 機能2用：結果ログを記録
                     st.session_state.quiz_results_log.append({
                         "question": q["question"],
                         "user_answer": option,
@@ -605,7 +724,9 @@ else:
 
         if st.session_state.answered:
             st.markdown("---")
-            if st.session_state.selected_option[:1] == q["answer"][:1]:
+            if st.session_state.selected_option == "時間切れ（未回答）":
+                st.markdown('<div class="incorrect-box">⏰ <b>時間切れです！</b> 正解は <b>%s</b> です。</div>' % q["answer"], unsafe_allow_html=True)
+            elif st.session_state.selected_option[:1] == q["answer"][:1]:
                 st.markdown('<div class="correct-box">🎉 <b>正解です！</b></div>', unsafe_allow_html=True)
             else:
                 st.markdown(f'<div class="incorrect-box">😢 <b>不正解…</b> （あなたの回答: {st.session_state.selected_option}）<br>正解は <b>{q["answer"]}</b> です。</div>', unsafe_allow_html=True)
@@ -623,9 +744,13 @@ else:
                 st.session_state.answered = False
                 st.session_state.selected_option = None
                 st.rerun()
+        else:
+            # タイムアップに向けて自動で画面を再描画させるためのバックグラウンド処理
+            time.sleep(1)
+            st.rerun()
 
     # ==========================================
-    # 3. 全問終了後の結果画面（機能2：全問レビューリスト付き）
+    # 4. 全問終了後の結果画面（全問レビュー ＆ 弱点レポート付き）
     # ==========================================
     else:
         st.balloons()
@@ -645,10 +770,17 @@ else:
             })
             st.session_state.history_recorded = True
         
+        # 弱点レポートの表示
+        st.markdown("---")
+        st.subheader("📊 今回の弱点・分野別ミス分析レポート")
+        if len(st.session_state.category_mistakes) > 0:
+            df_m = pd.DataFrame(list(st.session_state.category_mistakes.items()), columns=["分野", "累積ミス回数"])
+            st.bar_chart(df_m.set_index("分野"))
+        else:
+            st.success("素晴らしい！今回のセットではミスがありませんでした！")
+
         st.markdown("---")
         st.subheader("📋 今回の全問レビュー（答え合わせ）")
-        
-        # 機能2：全問レビューの表示ループ
         for idx, log in enumerate(st.session_state.quiz_results_log):
             status = "🟢 正解" if log["is_correct"] else "🔴 不正解"
             with st.expander(f"第{idx+1}問: {status} - {log['question'][:30]}..."):
@@ -661,7 +793,7 @@ else:
         col1, col2 = st.columns(2)
         with col1:
             if st.button("🏠 ホーム画面に戻る", type="primary", use_container_width=True):
-                st.session_state.game_started = False
+                st.session_state.app_mode = "home"
                 st.session_state.history_recorded = False
                 st.rerun()
         with col2:
@@ -670,7 +802,7 @@ else:
                 review_list = st.session_state.wrong_questions.copy()
                 random.shuffle(review_list)
                 st.session_state.shuffled_quiz = prepare_quiz_session(review_list)
-                st.session_state.game_started = True
+                st.session_state.app_mode = "quiz"
                 st.session_state.mode_label = "🔄 間違い復習モード"
                 st.session_state.current_q = 0
                 st.session_state.score = 0
