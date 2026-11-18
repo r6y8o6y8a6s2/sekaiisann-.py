@@ -1,4 +1,6 @@
 import streamlit as st
+import random
+import re
 
 # ページ設定
 st.set_page_config(
@@ -7,7 +9,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- クイズデータ（ここに問題を追加していくだけで増やせます） ---
+# --- QUIZ_DATA（全40問のデータ） ---
 QUIZ_DATA = [
     {
         "question": "問題(1) 法隆寺地域の仏教建造物が日本で初めて世界遺産に登録された年はいつか。",
@@ -136,7 +138,7 @@ QUIZ_DATA = [
         "explanation": "正解は「④ すべて正解」です。禁教期に信仰を続けた潜伏キリシタンの歴史を物語る12の資産で構成されています。"
     },
     {
-        "question": "問題(22) 奄美大島、徳之島、沖縄島北部及び西表島が自然遺産に登録された最大の要因は何か。",
+        "question": "問題(22) 奄美大島、徳之島、沖縄島北部及び西表島が自然遺産に登録された最大の要因はどれか。",
         "options": ["① アマミノクロウサギやイリオモテヤマネコなど、高い固有種・絶滅危惧種の生息地であること", "② 日本最大のサンゴ礁が広がっていること", "③ 世界で最も降水量が多いこと", "④ 人口が非常に少ない手つかずの島であること"],
         "answer": "① アマミノクロウサギやイリオモテヤマネコなど、高い固有種・絶滅危惧種の生息地であること",
         "explanation": "正解は「①」です。大陸から分離した歴史を持つ亜熱帯の島々で、独自の進化を遂げた生物多様性のホットスポットとなっています。"
@@ -208,7 +210,7 @@ QUIZ_DATA = [
         "explanation": "正解は「① 1966年（昭和41年）」です。小中学校の遠足で発見され、その後大きな話題となりました。"
     },
     {
-        "question": "问题(34) 白神山地のブナ林において、秋に実るドングリ状の果実を好んで食べる代表的な大型野生動物はどれか。",
+        "question": "問題(34) 白神山地のブナ林において、秋に実るドングリ状の果実を好んで食べる代表的な大型野生動物はどれか。",
         "options": ["① ニホンジカ", "② ツキノワグマ", "③ ニホンカモシカ", "④ ホンドギツネ"],
         "answer": "② ツキノワグマ",
         "explanation": "正解は「② ツキノワグマ」です。ブナの実（ブナのまにまに）はツキノワグマなどの貴重な栄養源となります。"
@@ -220,13 +222,13 @@ QUIZ_DATA = [
         "explanation": "正解は「① 平等院鳳凰堂」です。10円硬貨のデザインにも描かれている平安時代の阿弥陀堂建築の傑作です。"
     },
     {
-        "question": "問題(36) 白川郷・五箇山の合掌造りで、屋根の茅（カヤ）を葺き替える作業を地域の人々が助け合う共同作業の名称は何か。",
+        "question": "問題(36) 白川郷・五箇山の合掌造りで、屋根の茅（カヤ）を葺き替える作業を地域の人々が助け合う共同作業の名称はどれか。",
         "options": ["① 結（ゆい）", "② 手伝い組", "③ 講（こう）", "④ 助け合い会"],
         "answer": "① 結（ゆい）",
         "explanation": "正解は「① 結（ゆい）」です。豪雪地帯で過酷な生活や大規模な屋根葺きを維持するため、地域住民の強い連帯が不可欠でした。"
     },
     {
-        "question": "問題(37) 原爆ドームが保存されることになった最大のきっかけは何か。",
+        "question": "問題(37) 原爆ドームが保存されることになった最大のきっかけはどれか。",
         "options": ["① 最初に建てた建築家が生き残っていたから", "② 広島市民による保存運動と、市議会の決議による恒久保存方針の決定", "③ 政府が観光資源として予算を出したから", "④ アメリカ軍が記念碑として指定したから"],
         "answer": "② 広島市民による保存運動と、市議会の決議による恒久保存方針の決定",
         "explanation": "正解は「②」です。被爆後の瓦礫のなかにあって、市民や修学旅行生、全国からの募金・運動によって保存が勝ち取られました。"
@@ -238,7 +240,7 @@ QUIZ_DATA = [
         "explanation": "正解は「② クスノキ」です。防虫効果や耐水性に優れた自然のクスノキの巨木が用いられています。"
     },
     {
-        "question": "問題(39) 平城宮跡（古都奈良の文化財）の中で、1998年に復元されシンボルとなっている建物はどれか。",
+        "question": "問題(39) 平城宮跡（古都奈良の文化財）の中で、1998年に復元されシンボルとなっている建物は何か。",
         "options": ["① 大極殿", "② 朱雀門", "③ 東院庭園", "④ 平城京左京三条二坊"],
         "answer": "② 朱雀門",
         "explanation": "正解は「② 朱雀門」です。平城京の正門にあたり、1998年に復元されて奈良のシンボルの一つとなっています。"
@@ -251,7 +253,19 @@ QUIZ_DATA = [
     }
 ]
 
-# --- セッション状態（現在の問題番号・スコア・回答状況）の初期化 ---
+# --- 追加・変更した部分（ここをコードに追加・差し替えました） ---
+
+# 1. 冒頭で random と re（正規表現）をインポートする（ファイルの最上部に追加）
+# import random
+# import re
+
+# 2. セッション状態の初期化と「ランダムシャッフル」の処理
+if "shuffled_quiz" not in st.session_state:
+    # データをコピーしてランダムにシャッフルする
+    quiz_list = QUIZ_DATA.copy()
+    random.shuffle(quiz_list)
+    st.session_state.shuffled_quiz = quiz_list
+
 if "current_q" not in st.session_state:
     st.session_state.current_q = 0
 if "score" not in st.session_state:
@@ -261,31 +275,37 @@ if "answered" not in st.session_state:
 if "selected_option" not in st.session_state:
     st.session_state.selected_option = None
 
+# シャッフル済みのクイズリストを参照する
+active_quiz = st.session_state.shuffled_quiz
+
 # タイトルと進捗バー
 st.markdown('<h2 style="font-size: 1.8rem;">🏛️ 旅好きならわかって当然だよね？</h2>', unsafe_allow_html=True)
-st.progress((st.session_state.current_q) / len(QUIZ_DATA))
+st.progress((st.session_state.current_q) / len(active_quiz))
 st.markdown("---")
 
 # --- クイズ出題・判定ロジック ---
-if st.session_state.current_q < len(QUIZ_DATA):
-    q = QUIZ_DATA[st.session_state.current_q]
+if st.session_state.current_q < len(active_quiz):
+    q = active_quiz[st.session_state.current_q]
     
-    # 問題文の表示
-    st.subheader(q["question"])
+    # 【追加した工夫】
+    # データ側にある「問題(1) 」などの文字を自動で消去するコード
+    clean_question = re.sub(r'^問題\(\d+\)\s*', '', q["question"])
+    
+    # 画面にはランダムな順番に合わせて「第1問」「第2問」と自動で振る
+    st.subheader(f"第{st.session_state.current_q + 1}問：{clean_question}")
     st.write("")
 
-    # 四択ボタンの表示（2列×2行のグリッド配置で見やすく）
+    # 四択ボタンの表示
     col1, col2 = st.columns(2)
     for i, option in enumerate(q["options"]):
         target_col = col1 if i % 2 == 0 else col2
         with target_col:
-            # すでに回答済みの場合はボタンを無効化（二重押し防止）
             if st.button(option, key=f"opt_{i}", use_container_width=True, disabled=st.session_state.answered):
                 st.session_state.answered = True
                 st.session_state.selected_option = option
                 if option == q["answer"]:
                     st.session_state.score += 1
-                st.rerun()  # 画面を即座に更新して結果を表示
+                st.rerun()
 
     # ボタンを押した直後の判定表示
     if st.session_state.answered:
@@ -295,10 +315,8 @@ if st.session_state.current_q < len(QUIZ_DATA):
         else:
             st.error(f"😢 **不正解…** （あなたの回答: {st.session_state.selected_option}）")
         
-        # 解説ボックス
         st.info(f"💡 **解説:** {q['explanation']}")
 
-        # 次の問題へ進むボタン
         if st.button("次の問題へ ➡️", type="primary"):
             st.session_state.current_q += 1
             st.session_state.answered = False
@@ -309,9 +327,14 @@ if st.session_state.current_q < len(QUIZ_DATA):
 else:
     st.balloons()
     st.header("🎊 全問終了！お疲れ様でした！")
-    st.metric(label="最終スコア", value=f"{st.session_state.score} / {len(QUIZ_DATA)} 問正解")
+    st.metric(label="最終スコア", value=f"{st.session_state.score} / {len(active_quiz)} 問正解")
     
-    if st.button("最初からもう一度挑戦する 🔄", type="primary"):
+    if st.button("もう一度ランダムで挑戦する 🔄", type="primary"):
+        # もう一度挑戦するときに、再度問題の順番を新しくシャッフルする
+        quiz_list = QUIZ_DATA.copy()
+        random.shuffle(quiz_list)
+        st.session_state.shuffled_quiz = quiz_list
+        
         st.session_state.current_q = 0
         st.session_state.score = 0
         st.session_state.answered = False
