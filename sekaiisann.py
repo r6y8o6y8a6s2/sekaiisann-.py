@@ -40,7 +40,7 @@ if "selected_option" not in st.session_state:
     st.session_state.selected_option = None
 
 # タイトルと進捗バー
-st.title("🏛️ 旅好きならわかって当然だよね？")
+st.markdown('<h2 style="font-size: 1.8rem;">🏛️ 旅好きならわかって当然だよね？</h2>', unsafe_allow_html=True)
 st.progress((st.session_state.current_q) / len(QUIZ_DATA))
 st.markdown("---")
 
