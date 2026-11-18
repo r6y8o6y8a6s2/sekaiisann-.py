@@ -97,8 +97,8 @@ QUIZ_DATA = [
     },
     {
         "question": "問題(15) 小笠原諸島が自然遺産に登録された主な理由は何か。",
-        "options": ["① 大規模なサンゴ礁があるから", "② 陸産貝類と維管束植物が高い固有率であるから", "③ 世界最大の活火山があるから", "④ 深海魚の宝庫だから"],
-        "answer": "② 陸産貝類と維管束植物が高い固有率であるから",
+        "options": ["① 大規模なサンゴ礁があるから", "② 一度も大陸と陸続きになったことがなく、独自の進化を遂げた固有種が多いから（ガラパゴス的進化）", "③ 世界最大の活火山があるから", "④ 深海魚の宝庫だから"],
+        "answer": "② 一度も大陸と陸続きになったことがない「海洋島」で、独自の進化（固有種）が見られるから",
         "explanation": "正解は「②」です。大陸から遠く離れた海洋島であるため、生物が独自の進化を遂げ「東洋のガラパゴス」とも称されます。"
     },
     {
@@ -109,8 +109,8 @@ QUIZ_DATA = [
     },
     {
         "question": "問題(17) 富士山－信仰の対象と芸術の源泉（静岡・山梨県）の構成資産に含まれないものはどれか。",
-        "options": ["① 富士山山頂の神域", "② 白糸の滝", "③ 三保松原", "④ 那智大滝"],
-        "answer": "④ 那智大滝",
+        "options": ["① 富士山山頂の神域", "② 白糸の滝", "③ 三保松原", "④ 東京タワー"],
+        "answer": "④ 東京タワー",
         "explanation": "正解は「④ 東京タワー」です。富士山周辺の神社や登山道、湖沼、白糸の滝、そして遠く離れた景勝地である「三保松原」などが構成資産です。"
     },
     {
@@ -138,9 +138,9 @@ QUIZ_DATA = [
         "explanation": "正解は「④ すべて正解」です。禁教期に信仰を続けた潜伏キリシタンの歴史を物語る12の資産で構成されています。"
     },
     {
-        "question": "問題(22) 奄美大島、徳之島、沖縄島北部及び西表島が自然遺産に登録された最大の要因はどれか。",
-        "options": ["① かつて大陸と陸続きで遺存固有種が多いこと", "② 日本最大のサンゴ礁が広がっていること", "③ 世界で最も降水量が多いこと", "④ 人口が非常に少ない手つかずの島であること"],
-        "answer": "① かつて大陸と陸続きで遺存固有種が多いこと",
+        "question": "問題(22) 奄美大島、徳之島、沖縄島北部及び西表島が自然遺産に登録された最大の要因は何か。",
+        "options": ["① アマミノクロウサギやイリオモテヤマネコなど、高い固有種・絶滅危惧種の生息地であること", "② 日本最大のサンゴ礁が広がっていること", "③ 世界で最も降水量が多いこと", "④ 人口が非常に少ない手つかずの島であること"],
+        "answer": "① アマミノクロウサギやイリオモテヤマネコなど、高い固有種・絶滅危惧種の生息地であること",
         "explanation": "正解は「①」です。大陸から分離した歴史を持つ亜熱帯の島々で、独自の進化を遂げた生物多様性のホットスポットとなっています。"
     },
     {
@@ -217,8 +217,8 @@ QUIZ_DATA = [
     },
     {
         "question": "問題(35) 古都京都の文化財の構成資産の一つである「宇治市」にある世界遺産といえばどこか。",
-        "options": ["① 平等院", "② 石山寺", "③ 三井寺", "④ 醍醐寺"],
-        "answer": "① 平等院",
+        "options": ["① 平等院（鳳凰堂）", "② 石山寺", "③ 三井寺", "④ 醍醐寺"],
+        "answer": "① 平等院（鳳凰堂）",
         "explanation": "正解は「① 平等院鳳凰堂」です。10円硬貨のデザインにも描かれている平安時代の阿弥陀堂建築の傑作です。"
     },
     {
@@ -229,13 +229,13 @@ QUIZ_DATA = [
     },
     {
         "question": "問題(37) 原爆ドームが保存されることになった最大のきっかけはどれか。",
-        "options": ["① 最初に建てた建築家が生き残っていたから", "② 原子力戦争は文明の週末を意味したから", "③ 政府が観光資源として予算を出したから", "④ アメリカ軍が記念碑として指定したから"],
-        "answer": "② 原子力戦争は文明の週末を意味したから",
+        "options": ["① 最初に建てた建築家が生き残っていたから", "② 広島市民による保存運動と、市議会の決議による恒久保存方針の決定", "③ 政府が観光資源として予算を出したから", "④ アメリカ軍が記念碑として指定したから"],
+        "answer": "② 広島市民による保存運動と、市議会の決議による恒久保存方針の決定",
         "explanation": "正解は「②」です。被爆後の瓦礫のなかにあって、市民や修学旅行生、全国からの募金・運動によって保存が勝ち取られました。"
     },
     {
-        "question": "問題(38) 厳島神社の「大鳥居」の現在の主柱に使われている主な木材の種類はどれか。",
-        "options": ["① スギ", "② クスノキ", "③ ヒノキ", "④ マツ"],
+        "question": "問題数(38) 厳島神社の「大鳥居」の現在の主柱に使われている主な木材の種類はどれか。",
+        "options": ["① スギ", "② クスノキの自然木", "③ ヒノキ", "④ マツ"],
         "answer": "② クスノキの自然木",
         "explanation": "正解は「② クスノキ」です。防虫効果や耐水性に優れた自然のクスノキの巨木が用いられています。"
     },
@@ -243,41 +243,21 @@ QUIZ_DATA = [
         "question": "問題(39) 平城宮跡（古都奈良の文化財）の中で、1998年に復元されシンボルとなっている建物は何か。",
         "options": ["① 大極殿", "② 朱雀門", "③ 東院庭園", "④ 平城京左京三条二坊"],
         "answer": "② 朱雀門",
-        "explanation": "正解は「② 朱雀門」です。平城京の正門にあたり、1998年に復元されて奈良のシンボルの一つとなっています。"
+        "explanation": "正解は“② 朱雀門”です。平城京の正門にあたり、1998年に復元されて奈良のシンボルの一つとなっています。"
     },
     {
         "question": "問題(40) 日光東照宮の有名な彫刻で、「見ざる・言わざる・聞かざる」の3匹のサルが彫られている建物の名称はどれか。",
         "options": ["① 神厩舎（しんきゅうしゃ）", "② 陽明門", "③ 五重塔", "④ 唐門"],
         "answer": "① 神厩舎（しんきゅうしゃ）",
         "explanation": "正解は「① 神厩舎」です。猿が馬を守る動物とされたことから、馬小屋に人間の人生訓になぞらえた猿の彫刻が施されています。"
-    },
-    {
-        "question": "問題(41) 2027年に開催される第49回世界遺産委員会の開催地はどこか。",
-        "options": ["① パリ", "② イスタンブール", "③ 日本", "④ 釜山"],
-        "answer": "② イスタンブール",
-        "explanation": "正解は「② イスタンブール」です。トルコのイスタンブールで開催されます。"
-    },
-    {
-        "question": "問題(42) ICOMOSが設立されたのはいつか。",
-        "options": ["① 1948", "② 1959", "③ 1960", "④ 1965"],
-        "answer": "④ 1965",
-        "explanation": "正解は「④ 1965」です。"
     }
 ]
 
-# --- 追加・変更した部分（ここをコードに追加・差し替えました） ---
-
-# 1. 冒頭で random と re（正規表現）をインポートする（ファイルの最上部に追加）
-# import random
-# import re
-
-# 2. セッション状態の初期化と「ランダムシャッフル」の処理
+# --- セッション状態の初期化 ---
+if "game_started" not in st.session_state:
+    st.session_state.game_started = False
 if "shuffled_quiz" not in st.session_state:
-    # データをコピーしてランダムにシャッフルする
-    quiz_list = QUIZ_DATA.copy()
-    random.shuffle(quiz_list)
-    st.session_state.shuffled_quiz = quiz_list
-
+    st.session_state.shuffled_quiz = []
 if "current_q" not in st.session_state:
     st.session_state.current_q = 0
 if "score" not in st.session_state:
@@ -287,68 +267,115 @@ if "answered" not in st.session_state:
 if "selected_option" not in st.session_state:
     st.session_state.selected_option = None
 
-# シャッフル済みのクイズリストを参照する
-active_quiz = st.session_state.shuffled_quiz
-
-# タイトルと進捗バー
+# タイトル
 st.markdown('<h2 style="font-size: 1.8rem;">🏛️ 旅好きならわかって当然だよね？</h2>', unsafe_allow_html=True)
-st.progress((st.session_state.current_q) / len(active_quiz))
 st.markdown("---")
 
-# --- クイズ出題・判定ロジック ---
-if st.session_state.current_q < len(active_quiz):
-    q = active_quiz[st.session_state.current_q]
+# ==========================================
+# モード選択画面（まだゲームが始まっていないとき）
+# ==========================================
+if not st.session_state.game_started:
+    st.subheader("🎯 出題モードを選んでね")
     
-    # 【追加した工夫】
-    # データ側にある「問題(1) 」などの文字を自動で消去するコード
-    clean_question = re.sub(r'^問題\(\d+\)\s*', '', q["question"])
+    # 出題数の選択肢
+    mode = st.radio(
+        "挑戦する問題数：",
+        ["サクッと10問モード", "ハーフ20問モード", "ガッツリ全問（40問）モード"]
+    )
     
-    # 画面にはランダムな順番に合わせて「第1問」「第2問」と自動で振る
-    st.subheader(f"第{st.session_state.current_q + 1}問：{clean_question}")
     st.write("")
-
-    # 四択ボタンの表示
-    col1, col2 = st.columns(2)
-    for i, option in enumerate(q["options"]):
-        target_col = col1 if i % 2 == 0 else col2
-        with target_col:
-            if st.button(option, key=f"opt_{i}", use_container_width=True, disabled=st.session_state.answered):
-                st.session_state.answered = True
-                st.session_state.selected_option = option
-                if option[:1] == q["answer"][:1]:
-                    st.session_state.score += 1
-                st.rerun()
-
-    # ボタンを押した直後の判定表示
-    if st.session_state.answered:
-        st.markdown("---")
-        if st.session_state.selected_option == q["answer"]:
-            st.success("🎉 **正解！**")
+    if st.button("🚀 クイズをスタートする！", type="primary", use_container_width=True):
+        # 選択されたモードに応じて問題数を決定
+        if "10問" in mode:
+            limit = 10
+        elif "20問" in mode:
+            limit = 20
         else:
-            st.error(f"😢 **不正解…** （あなたの回答: {st.session_state.selected_option}）")
-        
-        st.info(f"💡 **解説:** {q['explanation']}")
-
-        if st.button("次の問題へ ➡️", type="primary"):
-            st.session_state.current_q += 1
-            st.session_state.answered = False
-            st.session_state.selected_option = None
-            st.rerun()
-
-# --- 全問終了後の結果画面 ---
-else:
-    st.balloons()
-    st.header("🎊 全問終了！お疲れ様でした！")
-    st.metric(label="最終スコア", value=f"{st.session_state.score} / {len(active_quiz)} 問正解")
-    
-    if st.button("もう一度ランダムで挑戦する 🔄", type="primary"):
-        # もう一度挑戦するときに、再度問題の順番を新しくシャッフルする
+            limit = len(QUIZ_DATA)
+            
+        # データをシャッフルして指定した数だけ抽出
         quiz_list = QUIZ_DATA.copy()
         random.shuffle(quiz_list)
-        st.session_state.shuffled_quiz = quiz_list
+        st.session_state.shuffled_quiz = quiz_list[:limit]
         
+        # ゲーム開始フラグをONにして変数をリセット
+        st.session_state.game_started = True
         st.session_state.current_q = 0
         st.session_state.score = 0
         st.session_state.answered = False
         st.session_state.selected_option = None
         st.rerun()
+
+# ==========================================
+# クイズ出題・プレイ中の画面
+# ==========================================
+else:
+    active_quiz = st.session_state.shuffled_quiz
+    
+    # 進捗バー
+    st.progress((st.session_state.current_q) / len(active_quiz))
+
+    if st.session_state.current_q < len(active_quiz):
+        q = active_quiz[st.session_state.current_q]
+        
+        # 問題番号の自動削除とナンバリング
+        clean_question = re.sub(r'^問題\(\d+\)\s*', '', q["question"])
+        st.subheader(f"第{st.session_state.current_q + 1}問 / 全{len(active_quiz)}問")
+        st.markdown(f"**{clean_question}**")
+        st.write("")
+
+        # 四択ボタンの表示
+        col1, col2 = st.columns(2)
+        for i, option in enumerate(q["options"]):
+            target_col = col1 if i % 2 == 0 else col2
+            with target_col:
+                if st.button(option, key=f"opt_{i}", use_container_width=True, disabled=st.session_state.answered):
+                    st.session_state.answered = True
+                    st.session_state.selected_option = option
+                    
+                    # 記号（①〜④）が一致しているかで判定
+                    if option[:1] == q["answer"][:1]:
+                        st.session_state.score += 1
+                    st.rerun()
+
+        # 判定表示
+        if st.session_state.answered:
+            st.markdown("---")
+            if st.session_state.selected_option[:1] == q["answer"][:1]:
+                st.success("🎉 **正解！**")
+            else:
+                st.error(f"😢 **不正解…** （あなたの回答: {st.session_state.selected_option}）")
+            
+            st.info(f"💡 **解説:** {q['explanation']}")
+
+            if st.button("次の問題へ ➡️", type="primary"):
+                st.session_state.current_q += 1
+                st.session_state.answered = False
+                st.session_state.selected_option = None
+                st.rerun()
+
+    # --- 全問終了後の結果画面 ---
+    else:
+        st.balloons()
+        st.header("🎊 全問終了！お疲れ様でした！")
+        st.metric(label="最終スコア", value=f"{st.session_state.score} / {len(active_quiz)} 問正解")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("もう一度同じモードで挑戦する 🔄", type="primary", use_container_width=True):
+                # 同じ問題数で再シャッフル
+                limit = len(active_quiz)
+                quiz_list = QUIZ_DATA.copy()
+                random.shuffle(quiz_list)
+                st.session_state.shuffled_quiz = quiz_list[:limit]
+                
+                st.session_state.current_q = 0
+                st.session_state.score = 0
+                st.session_state.answered = False
+                st.session_state.selected_option = None
+                st.rerun()
+        with col2:
+            if st.button("モードを選び直す 🏠", use_container_width=True):
+                # ホーム画面に戻る
+                st.session_state.game_started = False
+                st.rerun()
