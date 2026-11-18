@@ -40,7 +40,7 @@ if "selected_option" not in st.session_state:
     st.session_state.selected_option = None
 
 # タイトルと進捗バー
-st.title("🏛️ 世界遺産 4択マスター")
+st.title("🏛️ 旅好きならわかって当然だよね？")
 st.progress((st.session_state.current_q) / len(QUIZ_DATA))
 st.markdown("---")
 
