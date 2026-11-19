@@ -43,8 +43,7 @@ JAPAN_HERITAGE_MAP = [
 ]
 
 # --- セッション状態の初期データベース管理 ---
-if "quiz_master_data" not in st.session_state:
-    st.session_state.quiz_master_data = [
+QUIZ_DATA = [
         {
         "id": 1,
         "category": "🏛️ 寺社・建築",
@@ -560,10 +559,7 @@ if st.session_state.app_mode == "home":
         if st.button("🗺️ 遺産マップ", use_container_width=True):
             st.session_state.app_mode = "map"
             st.rerun()
-    with col_nav4:
-        if st.button("✍️ 問題作成", use_container_width=True):
-            st.session_state.app_mode = "creator"
-            st.rerun()
+   
 
     st.markdown("---")
     st.subheader("⚙️ カスタム練習クイズ")
@@ -690,53 +686,6 @@ elif st.session_state.app_mode == "map":
         st.session_state.app_mode = "home"
         st.rerun()
 
-# ==========================================
-# 3. ✍️ マイ問題帳（オリジナル問題追加機能）
-# ==========================================
-elif st.session_state.app_mode == "creator":
-    st.subheader("✍️ マイ問題帳（オリジナル問題の作成）")
-    st.caption("自分でひっかけ問題や覚えたい知識を入力し、問題集をカスタマイズできます！")
-    
-    with st.form("custom_quiz_form"):
-        new_q = st.text_input("問題文：")
-        new_cat = st.selectbox("分野：", ["🏛️ 寺社・建築", "🌲 自然遺産", "📜 歴史・条約", "📅 年代・基準・制度"])
-        new_diff = st.selectbox("難易度：", ["基礎", "標準", "難問"])
-        
-        st.markdown("**4つの選択肢（※18文字以内を推奨）**")
-        opt1 = st.text_input("選択肢①", value="① ")
-        opt2 = st.text_input("選択肢②", value="② ")
-        opt3 = st.text_input("選択肢③", value="③ ")
-        opt4 = st.text_input("選択肢④", value="④ ")
-        
-        correct_opt = st.selectbox("正解の選択肢：", [opt1, opt2, opt3, opt4])
-        new_expl = st.text_area("解説文：")
-        new_tag = st.text_input("検定ポイント（タグ）：", value="オリジナル問題 / 登録年: 2026年")
-        new_trivia = st.text_input("トリビア（豆知識）：", value="自分が作ったオリジナル問題です！")
-        
-        submitted = st.form_submit_button("📥 問題を追加して保存する", type="primary")
-        if submitted:
-            if new_q and opt1 and opt2 and opt3 and opt4:
-                new_id = max([item["id"] for item in st.session_state.quiz_master_data]) + 1
-                custom_item = {
-                    "id": new_id,
-                    "category": new_cat,
-                    "difficulty": new_diff,
-                    "question": new_q,
-                    "options": [opt1, opt2, opt3, opt4],
-                    "answer": correct_opt,
-                    "explanation": new_expl,
-                    "tag": new_tag,
-                    "trivia": new_trivia
-                }
-                st.session_state.quiz_master_data.append(custom_item)
-                st.success("🎉 新しい問題がデータベースに正常に追加されました！")
-            else:
-                st.error("問題文とすべての選択肢を入力してください。")
-
-    st.write("")
-    if st.button("🏠 ホームに戻る", use_container_width=True):
-        st.session_state.app_mode = "home"
-        st.rerun()
 
 # ==========================================
 # 4. 📇 暗記カードモード
