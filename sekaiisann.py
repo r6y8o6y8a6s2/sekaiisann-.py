@@ -12,40 +12,6 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- 🌙 / ☀️ 動的テーマカラー（ダークモード対応） ---
-if "dark_mode" not in st.session_state:
-    st.session_state.dark_mode = False
-
-if st.session_state.dark_mode:
-    bg_color = "#1e1e1e"
-    card_bg = "#2d2d2d"
-    text_color = "#f8f9fa"
-    border_color = "#444444"
-    correct_bg = "#0f5132"
-    incorrect_bg = "#842029"
-    expl_bg = "#084298"
-else:
-    bg_color = "#ffffff"
-    card_bg = "#f8f9fa"
-    text_color = "#212529"
-    border_color = "#dee2e6"
-    correct_bg = "#d1e7dd"
-    incorrect_bg = "#f8d7da"
-    expl_bg = "#cfe2ff"
-
-st.markdown(f"""
-    <style>
-    .stApp {{ background-color: {bg_color}; color: {text_color}; }}
-    .correct-box {{ padding: 15px; border-radius: 8px; background-color: {correct_bg}; color: {'#ffffff' if st.session_state.dark_mode else '#0f5132'}; margin-bottom: 10px; }}
-    .incorrect-box {{ padding: 15px; border-radius: 8px; background-color: {incorrect_bg}; color: {'#ffffff' if st.session_state.dark_mode else '#842029'}; margin-bottom: 10px; }}
-    .explanation-box {{ padding: 15px; border-radius: 8px; background-color: {expl_bg}; color: {'#ffffff' if st.session_state.dark_mode else '#084298'}; margin-bottom: 15px; }}
-    .trivia-box {{ padding: 15px; border-radius: 8px; background-color: #fff3cd; color: #664d03; margin-bottom: 20px; border-left: 5px solid #ffc107; }}
-    .flashcard {{ padding: 30px; border-radius: 12px; background-color: {card_bg}; border: 2px solid {border_color}; text-align: center; margin-bottom: 20px; }}
-    .pass-banner {{ padding: 20px; border-radius: 10px; background-color: {correct_bg}; color: {'#ffffff' if st.session_state.dark_mode else '#0f5132'}; text-align: center; border: 2px solid #198754; margin-bottom: 15px; }}
-    .fail-banner {{ padding: 20px; border-radius: 10px; background-color: {incorrect_bg}; color: {'#ffffff' if st.session_state.dark_mode else '#842029'}; text-align: center; border: 2px solid #dc3545; margin-bottom: 15px; }}
-    </style>
-""", unsafe_allow_html=True)
-
 # --- 🗺️ 日本の世界遺産 位置データ（マップ表示用） ---
 JAPAN_HERITAGE_MAP = [
     {"name": "知床", "region": "北海道・東北", "type": "自然遺産", "year": 2005, "lat": 44.0933, "lon": 145.1219},
@@ -501,13 +467,6 @@ if "study_dates" not in st.session_state:
 # サイドバー（ダッシュボード・テーマ切替・忘却曲線アラート）
 # ==========================================
 st.sidebar.title("📊 学習ダッシュボード")
-
-# 機能4：ダークモード / ライトモード切替
-is_dark = st.sidebar.toggle("🌙 ダークモードに切り替え", value=st.session_state.dark_mode)
-if is_dark != st.session_state.dark_mode:
-    st.session_state.dark_mode = is_dark
-    st.rerun()
-
 st.sidebar.markdown("---")
 
 total_sets = len(st.session_state.history)
