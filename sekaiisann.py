@@ -7,10 +7,23 @@ from datetime import datetime, date, timedelta
 
 # ページ設定
 st.set_page_config(
-    page_title="世界遺産 4択マスター（プロ仕様・完全版）",
+    page_title="世界遺産 4択マスター（検定2級対策）",
     page_icon="🏛️",
     layout="centered"
 )
+
+# --- 💡 カスタムCSS（ライトテーマ固定） ---
+st.markdown("""
+    <style>
+    .correct-box { padding: 15px; border-radius: 8px; background-color: #d1e7dd; color: #0f5132; margin-bottom: 10px; }
+    .incorrect-box { padding: 15px; border-radius: 8px; background-color: #f8d7da; color: #842029; margin-bottom: 10px; }
+    .explanation-box { padding: 15px; border-radius: 8px; background-color: #cfe2ff; color: #084298; margin-bottom: 15px; }
+    .trivia-box { padding: 15px; border-radius: 8px; background-color: #fff3cd; color: #664d03; margin-bottom: 20px; border-left: 5px solid #ffc107; }
+    .flashcard { padding: 30px; border-radius: 12px; background-color: #f8f9fa; border: 2px solid #dee2e6; text-align: center; margin-bottom: 20px; }
+    .pass-banner { padding: 20px; border-radius: 10px; background-color: #d1e7dd; color: #0f5132; text-align: center; border: 2px solid #198754; margin-bottom: 15px; }
+    .fail-banner { padding: 20px; border-radius: 10px; background-color: #f8d7da; color: #842029; text-align: center; border: 2px solid #dc3545; margin-bottom: 15px; }
+    </style>
+""", unsafe_allow_html=True)
 
 # --- 🗺️ 日本の世界遺産 位置データ（マップ表示用） ---
 JAPAN_HERITAGE_MAP = [
@@ -42,12 +55,10 @@ JAPAN_HERITAGE_MAP = [
     {"name": "琉球王国のグスク及び関連遺産群", "region": "九州・沖縄", "type": "文化遺産", "year": 2000, "lat": 26.2170, "lon": 127.7195},
 ]
 
-# --- セッション状態の初期データベース管理 ---
+# --- QUIZ_DATA（全31問・全選択肢18文字以内・カテゴリー/難易度なし） ---
 QUIZ_DATA = [
-        {
+    {
         "id": 1,
-        "category": "🏛️ 寺社・建築",
-        "difficulty": "標準",
         "question": "法隆寺地域の仏教建造物が日本で初めて世界遺産に登録された年はいつか。",
         "options": ["① 1985年", "② 1993年", "③ 1997年", "④ 2000年"],
         "answer": "② 1993年",
@@ -57,8 +68,6 @@ QUIZ_DATA = [
     },
     {
         "id": 2,
-        "category": "🏛️ 寺社・建築",
-        "difficulty": "基礎",
         "question": "姫路城の別称として正しいものはどれか。",
         "options": ["① 烏城", "② 鶴ヶ城", "③ 白鷺城", "④ 金城"],
         "answer": "③ 白鷺城",
@@ -68,8 +77,6 @@ QUIZ_DATA = [
     },
     {
         "id": 3,
-        "category": "🏛️ 寺社・建築",
-        "difficulty": "標準",
         "question": "古都京都の文化財の構成資産に含まれない寺社・城郭はどれか。",
         "options": ["① 清水寺", "② 二条城", "③ 東大寺", "④ 下鴨神社"],
         "answer": "③ 東大寺",
@@ -79,8 +86,6 @@ QUIZ_DATA = [
     },
     {
         "id": 4,
-        "category": "🏛️ 寺社・建築",
-        "difficulty": "標準",
         "question": "白川郷・五箇山の合掌造り集落において、特徴的な急勾配の屋根の角度はおおよそ何度か。",
         "options": ["① 30〜40度", "② 45〜60度", "③ 70〜80度", "④ 90度"],
         "answer": "② 45〜60度",
@@ -90,8 +95,6 @@ QUIZ_DATA = [
     },
     {
         "id": 5,
-        "category": "🏛️ 寺社・建築",
-        "difficulty": "難問",
         "question": "厳島神社（広島県）の社殿が海上に建てられている理由として正しいものはどれか。",
         "options": ["① 津波を防ぐため", "② 島全体が神域のため", "③ 海上交通の目印", "④ 要塞にするため"],
         "answer": "② 島全体が神域のため",
@@ -101,8 +104,6 @@ QUIZ_DATA = [
     },
     {
         "id": 6,
-        "category": "🏛️ 寺社・建築",
-        "difficulty": "標準",
         "question": "奈良時代の仏教文化を伝える「古都奈良の文化財」の構成資産に含まれないものはどれか。",
         "options": ["① 平城宮跡", "② 唐招提寺", "③ 興福寺", "④ 平等院鳳凰堂"],
         "answer": "④ 平等院鳳凰堂",
@@ -112,8 +113,6 @@ QUIZ_DATA = [
     },
     {
         "id": 7,
-        "category": "🏛️ 寺社・建築",
-        "difficulty": "基礎",
         "question": "日光の社寺（栃木県）で、世界遺産登録の対象となっている社寺の数と内訳はどれか。",
         "options": ["① 2社1寺", "② 3社3寺", "③ 1社2寺", "④ 5社5寺"],
         "answer": "① 2社1寺",
@@ -123,8 +122,6 @@ QUIZ_DATA = [
     },
     {
         "id": 8,
-        "category": "🏛️ 寺社・建築",
-        "difficulty": "標準",
         "question": "平泉－仏国土（浄土）を表現する遺跡群（岩手県）において、中心的な存在である寺院はどれか。",
         "options": ["① 中尊寺", "② 円覚寺", "③ 善光寺", "④ 金沢寺"],
         "answer": "① 中尊寺",
@@ -134,8 +131,6 @@ QUIZ_DATA = [
     },
     {
         "id": 9,
-        "category": "🏛️ 寺社・建築",
-        "difficulty": "難問",
         "question": "法隆寺の金堂や五重塔に代表される、世界最古の木造建築群が持つ建築様式の特徴はどれか。",
         "options": ["① 伝統的木造軸組構法", "② すべて石造りの壁", "③ 鉄筋コンクリート製", "④ レンガ造りアーチ"],
         "answer": "① 伝統的木造軸組構法",
@@ -145,8 +140,6 @@ QUIZ_DATA = [
     },
     {
         "id": 10,
-        "category": "🏛️ 寺社・建築",
-        "difficulty": "標準",
         "question": "古都京都の文化財の構成資産の一つである「宇治市」にある世界遺産といえばどこか。",
         "options": ["① 平等院鳳凰堂", "② 石山寺の本堂", "③ 三井寺の金堂", "④ 醍醐寺の五重塔"],
         "answer": "① 平等院鳳凰堂",
@@ -154,12 +147,8 @@ QUIZ_DATA = [
         "tag": "構成資産: 平等院・宇治上神社",
         "trivia": "宇治上神社は日本最古の神社建築本殿として知られています。"
     },
-
-    # --- 【分野：自然遺産】 ---
     {
         "id": 11,
-        "category": "🌲 自然遺産",
-        "difficulty": "基礎",
         "question": "屋久島に自生する樹齢数千年を超える代表的な植物はどれか。",
         "options": ["① ブナの巨木", "② 屋久杉（スギ）", "③ ヒノキの古木", "④ 天然のマツ"],
         "answer": "② 屋久杉（スギ）",
@@ -169,8 +158,6 @@ QUIZ_DATA = [
     },
     {
         "id": 12,
-        "category": "🌲 自然遺産",
-        "difficulty": "標準",
         "question": "白神山地が世界自然遺産に登録される決め手となった、原生的な森林を構成する樹木はどれか。",
         "options": ["① アカマツ", "② スギ林", "③ ブナの原生林", "④ カエデの林"],
         "answer": "③ ブナの原生林",
@@ -180,8 +167,6 @@ QUIZ_DATA = [
     },
     {
         "id": 13,
-        "category": "🌲 自然遺産",
-        "difficulty": "標準",
         "question": "知床が世界自然遺産に登録された最大の理由として評価された生態系上の特徴はどれか。",
         "options": ["① 亜熱帯のマングローブ", "② 流氷と陸上生態系の関係", "③ 標高3000mの高山帯", "④ 固有の砂漠気候帯"],
         "answer": "② 流氷と陸上生態系の関係",
@@ -191,8 +176,6 @@ QUIZ_DATA = [
     },
     {
         "id": 14,
-        "category": "🌲 自然遺産",
-        "difficulty": "標準",
         "question": "小笠原諸島が自然遺産に登録された主な理由は何か。",
         "options": ["① 大規模なサンゴ礁", "② 独自の進化（固有種）", "③ 世界最大の活火山", "④ 深海魚の豊かな生態系"],
         "answer": "② 独自の進化（固有種）",
@@ -202,8 +185,6 @@ QUIZ_DATA = [
     },
     {
         "id": 15,
-        "category": "🌲 自然遺産",
-        "difficulty": "標準",
         "question": "奄美大島、徳之島、沖縄島北部及び西表島が自然遺産に登録された最大の要因はどれか。",
         "options": ["① 固有種・絶滅危惧種", "② 日本最大のサンゴ礁", "③ 世界一の年間降水量", "④ 完全な無人島であること"],
         "answer": "① 固有種・絶滅危惧種",
@@ -213,8 +194,6 @@ QUIZ_DATA = [
     },
     {
         "id": 16,
-        "category": "🌲 自然遺産",
-        "difficulty": "基礎",
         "question": "富士山－信仰の対象と芸術の源泉（静岡・山梨県）の登録種別はどれか。",
         "options": ["① 自然遺産", "② 文化遺産", "③ 複合遺産", "④ 無形文化遺産"],
         "answer": "② 文化遺産",
@@ -222,12 +201,8 @@ QUIZ_DATA = [
         "tag": "登録年: 2013年 / 基準(iii)(vi)",
         "trivia": "富士山はその美しい容姿から、古くより人々の信仰の対象であり芸術のモチーフでした。"
     },
-
-    # --- 【分野：歴史・条約・産業遺産】 ---
     {
         "id": 17,
-        "category": "📜 歴史・条約",
-        "difficulty": "標準",
         "question": "原爆ドーム（広島平和記念碑）の設計を手掛けた建築家の出身国はどこか。",
         "options": ["① チェコ", "② ドイツ", "③ フランス", "④ イギリス"],
         "answer": "① チェコ",
@@ -237,8 +212,6 @@ QUIZ_DATA = [
     },
     {
         "id": 18,
-        "category": "📜 歴史・条約",
-        "difficulty": "標準",
         "question": "琉球王国のグスク及び関連遺産群の中で、首里城跡とともに登録された城の名称はどれか。",
         "options": ["① 熊本城の跡地", "② 中城城跡", "③ 大阪城の石垣", "④ 名古屋城の天守"],
         "answer": "② 中城城跡",
@@ -248,8 +221,6 @@ QUIZ_DATA = [
     },
     {
         "id": 19,
-        "category": "📜 歴史・条約",
-        "difficulty": "基礎",
         "question": "紀伊山地の霊場と参詣道において、3つの「霊場」に含まれないものはどれか。",
         "options": ["① 高野山", "② 吉野・大峯", "③ 熊野三山", "④ 比叡山"],
         "answer": "④ 比叡山",
@@ -259,8 +230,6 @@ QUIZ_DATA = [
     },
     {
         "id": 20,
-        "category": "📜 歴史・条約",
-        "difficulty": "難問",
         "question": "石見銀山遺跡（島根県）の世界遺産登録の決め手となった、特徴的な鉱石採掘・精錬法は何か。",
         "options": ["① 水銀圧搾法", "② 灰吹法", "③ アマルガム法", "④ 露天掘り手法"],
         "answer": "② 灰吹法",
@@ -270,8 +239,6 @@ QUIZ_DATA = [
     },
     {
         "id": 21,
-        "category": "📜 歴史・条約",
-        "difficulty": "標準",
         "question": "富岡製糸場と絹産業遺産群（群馬県）の構成資産に含まれないものはどれか。",
         "options": ["① 富岡製糸場", "② 荒船風穴", "③ 高山社跡", "④ 横浜赤レンガ倉庫"],
         "answer": "④ 横浜赤レンガ倉庫",
@@ -281,8 +248,6 @@ QUIZ_DATA = [
     },
     {
         "id": 22,
-        "category": "📜 歴史・条約",
-        "difficulty": "標準",
         "question": "明治日本の産業革命遺産の構成資産として正しくないものはどれか。",
         "options": ["① 官営八幡製鉄所", "② 軍艦島（端島炭坑）", "③ 長崎グラバー住宅", "④ 萩反射炉"],
         "answer": "③ 長崎グラバー住宅",
@@ -292,8 +257,6 @@ QUIZ_DATA = [
     },
     {
         "id": 23,
-        "category": "📜 歴史・条約",
-        "difficulty": "標準",
         "question": "「神宿る島」宗像・沖ノ島と関連遺産群において、一般人の立ち入りが原則禁止されている島はどれか。",
         "options": ["① 沖ノ島", "② 大島", "③ 相島", "④ 宗像大島"],
         "answer": "① 沖ノ島",
@@ -303,8 +266,6 @@ QUIZ_DATA = [
     },
     {
         "id": 24,
-        "category": "📜 歴史・条約",
-        "difficulty": "標準",
         "question": "長崎と天草地方の潜伏キリシタン関連遺産の構成資産に含まれないものはどれか。",
         "options": ["① 大浦天主堂", "② 原城跡", "③ 久賀島の集落", "④ 首里城跡"],
         "answer": "④ 首里城跡",
@@ -314,8 +275,6 @@ QUIZ_DATA = [
     },
     {
         "id": 25,
-        "category": "📜 歴史・条約",
-        "difficulty": "標準",
         "question": "北海道・北東北の縄文遺跡群の代表的な構成資産として正しくないものはどれか。",
         "options": ["① 三内丸山遺跡", "② 大湯環状列石", "③ 函館山要塞跡", "④ 小牧野遺跡"],
         "answer": "③ 函館山要塞跡",
@@ -325,8 +284,6 @@ QUIZ_DATA = [
     },
     {
         "id": 26,
-        "category": "📜 歴史・条約",
-        "difficulty": "基礎",
         "question": "佐渡島の金山が新しく世界文化遺産に登録された年はいつか。",
         "options": ["① 2022年", "② 2023年", "③ 2024年", "④ 2025年"],
         "answer": "③ 2024年",
@@ -334,12 +291,8 @@ QUIZ_DATA = [
         "tag": "登録年: 2024年 / 基準(iv)",
         "trivia": "手作業による伝統的な採掘技術から近代的な機械化まで、長期間の生産システムが良好に残されています。"
     },
-
-    # --- 【分野：年代・登録基準・条約の仕組み】 ---
     {
         "id": 27,
-        "category": "📅 年代・基準・制度",
-        "difficulty": "基礎",
         "question": "世界遺産条約が採択された年はいつか。",
         "options": ["① 1945年", "② 1972年", "③ 1992年", "④ 2003年"],
         "answer": "② 1972年",
@@ -349,8 +302,6 @@ QUIZ_DATA = [
     },
     {
         "id": 28,
-        "category": "📅 年代・基準・制度",
-        "difficulty": "基礎",
         "question": "ユネスコ（UNESCO）の本部が置かれている都市はどこか。",
         "options": ["① ジュネーブ", "② ニューヨーク", "③ パリ", "④ ローマ"],
         "answer": "③ パリ",
@@ -360,8 +311,6 @@ QUIZ_DATA = [
     },
     {
         "id": 29,
-        "category": "📅 年代・基準・制度",
-        "difficulty": "標準",
         "question": "世界遺産の登録基準において、文化遺産の基準の数はいくつあるか。",
         "options": ["① 4つ（(i)〜(iv)）", "② 6つ（(i)〜(vi)）", "③ 10つ（(i)〜(x)）", "④ 12つ"],
         "answer": "② 6つ（(i)〜(vi)）",
@@ -371,8 +320,6 @@ QUIZ_DATA = [
     },
     {
         "id": 30,
-        "category": "📅 年代・基準・制度",
-        "difficulty": "標準",
         "question": "世界遺産リストに登録されるための条件として最も重要な概念は何か。",
         "options": ["① 顕著な普遍的価値（OUV）", "② 年間100万人の観光客", "③ 最新のハイテク建築", "④ 入場料が無料であること"],
         "answer": "① 顕著な普遍的価値（OUV）",
@@ -382,8 +329,6 @@ QUIZ_DATA = [
     },
     {
         "id": 31,
-        "category": "📅 年代・基準・制度",
-        "difficulty": "標準",
         "question": "次のうち、日本の「無形文化遺産」に登録されているものはどれか。",
         "options": ["① 法隆寺の金堂", "② 姫路城の大天守", "③ 和食（日本人の伝統食）", "④ 原爆ドームの遺構"],
         "answer": "③ 和食（日本人の伝統食）",
@@ -417,9 +362,9 @@ def prepare_quiz_session(questions_list):
         prepared.append(q_copy)
     return prepared
 
-# --- その他のセッション状態の初期化 ---
+# --- セッション状態の初期化 ---
 if "app_mode" not in st.session_state:
-    st.session_state.app_mode = "home" # "home", "quiz", "flashcard", "map", "creator"
+    st.session_state.app_mode = "home"
 if "shuffled_quiz" not in st.session_state:
     st.session_state.shuffled_quiz = []
 if "current_q" not in st.session_state:
@@ -436,8 +381,6 @@ if "bookmarked_ids" not in st.session_state:
     st.session_state.bookmarked_ids = set()
 if "history" not in st.session_state:
     st.session_state.history = []
-if "category_mistakes" not in st.session_state:
-    st.session_state.category_mistakes = {}
 if "mode_label" not in st.session_state:
     st.session_state.mode_label = ""
 if "is_mock_exam" not in st.session_state:
@@ -453,15 +396,15 @@ if "mastered_card_ids" not in st.session_state:
     st.session_state.mastered_card_ids = set()
 if "fc_filter_unmastered" not in st.session_state:
     st.session_state.fc_filter_unmastered = False
-# 忘却曲線スケジュール用（問題IDごとに間違えた日付を保存）
+# 忘却曲線スケジュール用
 if "forgetting_curve_log" not in st.session_state:
-    st.session_state.forgetting_curve_log = {} # {id: datetime_str}
+    st.session_state.forgetting_curve_log = {}
 # ストリーク
 if "study_dates" not in st.session_state:
     st.session_state.study_dates = {str(date.today())}
 
 # ==========================================
-# サイドバー（ダッシュボード・テーマ切替・忘却曲線アラート）
+# サイドバー（ダッシュボード・忘却曲線アラート）
 # ==========================================
 st.sidebar.title("📊 学習ダッシュボード")
 st.sidebar.markdown("---")
@@ -481,7 +424,6 @@ else:
 st.sidebar.markdown(f"**現在のランク:** {rank_title}")
 st.sidebar.markdown(f"🔥 **連続学習記録:** {streak_days} 日目（累計 {total_sets} セット）")
 
-# 機能2：忘却曲線に基づく復習アラート
 due_review_count = len(st.session_state.forgetting_curve_log)
 if due_review_count > 0:
     st.sidebar.warning(f"🧠 忘却曲線アラート: 復習適齢期の問題が **{due_review_count}問** あります！")
@@ -502,16 +444,8 @@ if len(st.session_state.history) > 0:
 else:
     st.sidebar.caption("履歴がここにグラフ化されます。")
 
-st.sidebar.markdown("---")
-st.sidebar.subheader("⚠️ 分野別・弱点分析")
-if len(st.session_state.category_mistakes) > 0:
-    df_mistakes = pd.DataFrame(list(st.session_state.category_mistakes.items()), columns=["分野", "ミス回数"])
-    st.sidebar.bar_chart(df_mistakes.set_index("分野"))
-else:
-    st.sidebar.caption("ミスした分野が自動集計されます。")
-
 # タイトル
-st.markdown('<h2 style="font-size: 1.8rem;">🏛️ 世界遺産検定 4択マスター（プロ仕様）</h2>', unsafe_allow_html=True)
+st.markdown('<h2 style="font-size: 1.8rem;">🏛️ 世界遺産検定 4択マスター</h2>', unsafe_allow_html=True)
 st.markdown("---")
 
 # ==========================================
@@ -524,14 +458,14 @@ if st.session_state.app_mode == "home":
     dt = st.session_state.daily_trivia
     st.markdown(f"""
         <div class="trivia-box">
-            <b>💡 本日の世界遺産トリビア（{dt['category']}）</b><br>
+            <b>💡 本日の世界遺産トリビア</b><br>
             {dt['trivia']}
         </div>
     """, unsafe_allow_html=True)
 
-    st.subheader("🎯 プロ仕様 学習メニュー")
+    st.subheader("🎯 学習メニューを選択")
     
-    col_nav1, col_nav2, col_nav3, col_nav4 = st.columns(4)
+    col_nav1, col_nav2, col_nav3 = st.columns(3)
     with col_nav1:
         if st.button("🎓 本番模擬試験", type="primary", use_container_width=True):
             mock_list = QUIZ_DATA.copy()
@@ -557,18 +491,9 @@ if st.session_state.app_mode == "home":
         if st.button("🗺️ 遺産マップ", use_container_width=True):
             st.session_state.app_mode = "map"
             st.rerun()
-   
 
     st.markdown("---")
     st.subheader("⚙️ カスタム練習クイズ")
-    
-    col_f1, col_f2 = st.columns(2)
-    with col_f1:
-        categories = ["すべて"] + list(dict.fromkeys([q["category"] for q in QUIZ_DATA]))
-        selected_category = st.selectbox("📚 分野・ジャンル：", categories)
-    with col_f2:
-        difficulties = ["すべて", "基礎", "標準", "難問"]
-        selected_diff = st.selectbox("🎖️ 難易度レベル：", difficulties)
     
     mode = st.radio(
         "📝 挑戦する問題数：",
@@ -580,33 +505,25 @@ if st.session_state.app_mode == "home":
     
     if st.button("🚀 カスタムクイズをスタート！", use_container_width=True):
         filtered_data = QUIZ_DATA.copy()
-        if selected_category != "すべて":
-            filtered_data = [q for q in filtered_data if q["category"] == selected_category]
-        if selected_diff != "すべて":
-            filtered_data = [q for q in filtered_data if q["difficulty"] == selected_diff]
-        
-        if not filtered_data:
-            st.warning("条件に一致する問題がありません！")
+        if "10問" in mode:
+            limit = min(10, len(filtered_data))
+        elif "20問" in mode:
+            limit = min(20, len(filtered_data))
         else:
-            if "10問" in mode:
-                limit = min(10, len(filtered_data))
-            elif "20問" in mode:
-                limit = min(20, len(filtered_data))
-            else:
-                limit = len(filtered_data)
-            
-            random.shuffle(filtered_data)
-            st.session_state.shuffled_quiz = prepare_quiz_session(filtered_data[:limit])
-            st.session_state.app_mode = "quiz"
-            st.session_state.mode_label = "カスタム練習モード"
-            st.session_state.is_mock_exam = False
-            st.session_state.current_q = 0
-            st.session_state.score = 0
-            st.session_state.wrong_questions = []
-            st.session_state.quiz_results_log = []
-            st.session_state.answered = False
-            st.session_state.selected_option = None
-            st.rerun()
+            limit = len(filtered_data)
+        
+        random.shuffle(filtered_data)
+        st.session_state.shuffled_quiz = prepare_quiz_session(filtered_data[:limit])
+        st.session_state.app_mode = "quiz"
+        st.session_state.mode_label = "カスタム練習モード"
+        st.session_state.is_mock_exam = False
+        st.session_state.current_q = 0
+        st.session_state.score = 0
+        st.session_state.wrong_questions = []
+        st.session_state.quiz_results_log = []
+        st.session_state.answered = False
+        st.session_state.selected_option = None
+        st.rerun()
 
     st.write("")
     col1, col2, col3 = st.columns(3)
@@ -684,16 +601,15 @@ elif st.session_state.app_mode == "map":
         st.session_state.app_mode = "home"
         st.rerun()
 
-
 # ==========================================
-# 4. 📇 暗記カードモード
+# 3. 📇 暗記カードモード
 # ==========================================
 elif st.session_state.app_mode == "flashcard":
     st.subheader("📇 暗記カードモード（音声読み上げ対応）")
     
     mastered_cnt = len(st.session_state.mastered_card_ids)
     total_cnt = len(QUIZ_DATA)
-    st.progress(mastered_cnt / total_cnt)
+    st.progress(mastered_cnt / total_cnt if total_cnt > 0 else 0)
     st.caption(f"習得状況: {mastered_cnt} / {total_cnt} 枚 習得済み")
     
     filter_unmastered = st.checkbox("🔴 「まだ怪しい」カードだけ表示", value=st.session_state.fc_filter_unmastered)
@@ -716,9 +632,8 @@ elif st.session_state.app_mode == "flashcard":
         is_mastered = card["id"] in st.session_state.mastered_card_ids
         status_badge = "🟢 習得済み" if is_mastered else "🔴 未習得"
         
-        st.markdown(f"**カード {idx+1} / {len(fc_list)}** | `{card['category']}` | {status_badge}")
+        st.markdown(f"**カード {idx+1} / {len(fc_list)}** | {status_badge}")
         
-        # 機能1：音声読み上げ（JavaScript Web Speech API連携）
         speech_text = card['question'] if not st.session_state.flashcard_flipped else f"正解は、{card['answer']}。解説、{card['explanation']}"
         st.markdown(f"""
             <script>
@@ -789,7 +704,7 @@ elif st.session_state.app_mode == "flashcard":
                 st.rerun()
 
 # ==========================================
-# 5. クイズ・模擬試験プレイ画面
+# 4. クイズ・模擬試験プレイ画面
 # ==========================================
 elif st.session_state.app_mode == "quiz":
     active_quiz = st.session_state.shuffled_quiz
@@ -812,8 +727,7 @@ elif st.session_state.app_mode == "quiz":
             orig_q = next((item for item in QUIZ_DATA if item["id"] == q["id"]), q)
             if orig_q not in st.session_state.wrong_questions:
                 st.session_state.wrong_questions.append(orig_q)
-            st.session_state.category_mistakes[q['category']] = st.session_state.category_mistakes.get(q['category'], 0) + 1
-            st.session_state.forgetting_curve_log[q["id"]] = str(datetime.now()) # 忘却曲線用に記録
+            st.session_state.forgetting_curve_log[q["id"]] = str(datetime.now())
             
             st.session_state.quiz_results_log.append({
                 "question": q["question"], "user_answer": "時間切れ", "correct_answer": q["answer"],
@@ -826,7 +740,7 @@ elif st.session_state.app_mode == "quiz":
 
         top_col1, top_col2 = st.columns([3, 1])
         with top_col1:
-            st.markdown(f"### `{q['category']}` | 難易度: **{q['difficulty']}**")
+            st.subheader(f"第{st.session_state.current_q + 1}問 / 全{len(active_quiz)}問")
         with top_col2:
             is_bm = q["id"] in st.session_state.bookmarked_ids
             bm_label = "⭐ 登録済" if is_bm else "☆ ブックマーク"
@@ -837,7 +751,6 @@ elif st.session_state.app_mode == "quiz":
                     st.session_state.bookmarked_ids.add(q["id"])
                 st.rerun()
 
-        st.subheader(f"第{st.session_state.current_q + 1}問 / 全{len(active_quiz)}問")
         st.markdown(f"**{q['question']}**")
         st.write("")
 
@@ -852,15 +765,13 @@ elif st.session_state.app_mode == "quiz":
                     is_correct = (option[:1] == q["answer"][:1])
                     if is_correct:
                         st.session_state.score += 1
-                        # 正解したら忘却曲線ログから削除
                         if q["id"] in st.session_state.forgetting_curve_log:
                             del st.session_state.forgetting_curve_log[q["id"]]
                     else:
                         orig_q = next((item for item in QUIZ_DATA if item["id"] == q["id"]), q)
                         if orig_q not in st.session_state.wrong_questions:
                             st.session_state.wrong_questions.append(orig_q)
-                        st.session_state.category_mistakes[q['category']] = st.session_state.category_mistakes.get(q['category'], 0) + 1
-                        st.session_state.forgetting_curve_log[q["id"]] = str(datetime.now()) # 忘却曲線スケジュール登録
+                        st.session_state.forgetting_curve_log[q["id"]] = str(datetime.now())
                     
                     st.session_state.quiz_results_log.append({
                         "question": q["question"], "user_answer": option, "correct_answer": q["answer"],
@@ -871,7 +782,7 @@ elif st.session_state.app_mode == "quiz":
         if st.session_state.answered:
             st.markdown("---")
             if st.session_state.selected_option == "時間切れ":
-                st.markdown('<div class="incorrect-box">⏰ <b>時間切れです！</b> 正解は <b>%s</b> です。</div>' % q["answer"], unsafe_allow_html=True)
+                st.markdown(f'<div class="incorrect-box">⏰ <b>時間切れです！</b> 正解は <b>{q["answer"]}</b> です。</div>', unsafe_allow_html=True)
             elif st.session_state.selected_option[:1] == q["answer"][:1]:
                 st.markdown('<div class="correct-box">🎉 <b>正解です！</b></div>', unsafe_allow_html=True)
             else:
@@ -880,7 +791,7 @@ elif st.session_state.app_mode == "quiz":
             st.markdown(f"""
                 <div class="explanation-box">
                     <b>💡 解説:</b> {q['explanation']}<br><br>
-                    <span style="font-size: 0.9em; background-color: rgba(255,255,255,0.2); padding: 3px 6px; border-radius: 4px;">📌 <b>検定ポイント:</b> {q['tag']}</span>
+                    <span style="font-size: 0.9em; background-color: #ffffff; padding: 3px 6px; border-radius: 4px; color: #084298;">📌 <b>検定ポイント:</b> {q['tag']}</span>
                 </div>
             """, unsafe_allow_html=True)
 
@@ -894,7 +805,7 @@ elif st.session_state.app_mode == "quiz":
             st.rerun()
 
     # ==========================================
-    # 6. 結果発表画面
+    # 5. 結果発表画面
     # ==========================================
     else:
         total_len = len(active_quiz)
@@ -929,12 +840,6 @@ elif st.session_state.app_mode == "quiz":
             st.session_state.study_dates.add(str(date.today()))
             st.session_state.history_recorded = True
         
-        st.markdown("---")
-        st.subheader("📊 弱点・分野別ミス分析レポート")
-        if len(st.session_state.category_mistakes) > 0:
-            df_m = pd.DataFrame(list(st.session_state.category_mistakes.items()), columns=["分野", "累積ミス回数"])
-            st.bar_chart(df_m.set_index("分野"))
-
         st.markdown("---")
         st.subheader("📋 今回の全問レビュー（答え合わせ）")
         for idx, log in enumerate(st.session_state.quiz_results_log):
