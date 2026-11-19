@@ -393,8 +393,6 @@ QUIZ_DATA = [
     }
 ]
 
-QUIZ_DATA = st.session_state.quiz_master_data
-
 # --- ヘルパー関数：選択肢のシャッフル ---
 def prepare_quiz_session(questions_list):
     prepared = []
