@@ -695,7 +695,7 @@ if st.session_state.app_mode == "home":
     if "daily_trivia" not in st.session_state:
         st.session_state.daily_trivia = random.choice(QUIZ_DATA)
     
-    dt = st.session_state.daily_trivia
+   dt = st.session_state.daily_trivia
     st.markdown(f"""
         <div class="trivia-box">
             <b>💡 本日の世界遺産トリビア</b><br>
@@ -706,7 +706,7 @@ if st.session_state.app_mode == "home":
     st.subheader("🎯 学習メニューを選択")
     
     col_nav1, col_nav2, col_nav3 = st.columns(3)
-   with col_nav1:
+    with col_nav1:
         if st.button("🎓 本番模擬試験", type="primary", use_container_width=True):
             mock_list = QUIZ_DATA.copy()
             random.shuffle(mock_list)
@@ -800,7 +800,6 @@ if st.session_state.app_mode == "home":
             st.session_state.answered = False
             st.session_state.selected_option = None
             st.rerun()
-
     with col3:
         fc_due_list = [q for q in QUIZ_DATA if q["question"] in st.session_state.forgetting_curve_log]
         if st.button(f"🧠 忘却曲線復習 ({len(fc_due_list)}問)", disabled=(len(fc_due_list) == 0), use_container_width=True):
