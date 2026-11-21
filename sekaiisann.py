@@ -1,3 +1,111 @@
+import random
+import re
+import time
+from datetime import date, datetime
+import pandas as pd
+import streamlit as st
+
+st.set_page_config(
+    page_title="世界遺産検定 4択マスター",
+    page_icon="🏛️",
+    layout="centered",
+)
+
+# --- CSSスタイル定義 ---
+st.markdown("""
+<style>
+    .trivia-box {
+        background-color: #f0f7ff;
+        border-left: 5px solid #0d6efd;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        color: #111827;
+    }
+    .flashcard {
+        background-color: #ffffff;
+        border: 2px solid #dee2e6;
+        border-radius: 12px;
+        padding: 24px;
+        min-height: 200px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        color: #111827;
+    }
+    .correct-box {
+        background-color: #d1e7dd;
+        border-left: 5px solid #198754;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        color: #0f5132;
+    }
+    .incorrect-box {
+        background-color: #f8d7da;
+        border-left: 5px solid #dc3545;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        color: #842029;
+    }
+    .explanation-box {
+        background-color: #e7f1ff;
+        border-left: 5px solid #084298;
+        padding: 14px 16px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+        color: #052c65;
+    }
+    .pass-banner {
+        background-color: #d1e7dd;
+        border: 2px solid #198754;
+        padding: 18px;
+        border-radius: 10px;
+        text-align: center;
+        color: #0f5132;
+        margin-bottom: 16px;
+    }
+    .fail-banner {
+        background-color: #fff3cd;
+        border: 2px solid #ffc107;
+        padding: 18px;
+        border-radius: 10px;
+        text-align: center;
+        color: #664d03;
+        margin-bottom: 16px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# --- 日本の世界遺産マップデータ ---
+JAPAN_HERITAGE_MAP = [
+    {"name": "法隆寺地域の仏教建造物", "region": "近畿", "type": "文化遺産", "year": 1993, "lat": 34.6146, "lon": 135.7343},
+    {"name": "姫路城", "region": "近畿", "type": "文化遺産", "year": 1993, "lat": 34.8394, "lon": 134.6939},
+    {"name": "白神山地", "region": "東北", "type": "自然遺産", "year": 1993, "lat": 40.4728, "lon": 140.1306},
+    {"name": "屋久島", "region": "九州・沖縄", "type": "自然遺産", "year": 1993, "lat": 30.3597, "lon": 130.5297},
+    {"name": "古都京都の文化財", "region": "近畿", "type": "文化遺産", "year": 1994, "lat": 35.0116, "lon": 135.7681},
+    {"name": "白川郷・五箇山の合掌造り集落", "region": "中部", "type": "文化遺産", "year": 1995, "lat": 36.2725, "lon": 136.8986},
+    {"name": "原爆ドーム", "region": "中国・四国", "type": "文化遺産", "year": 1996, "lat": 34.3955, "lon": 132.4536},
+    {"name": "厳島神社", "region": "中国・四国", "type": "文化遺産", "year": 1996, "lat": 34.2960, "lon": 132.3198},
+    {"name": "古都奈良の文化財", "region": "近畿", "type": "文化遺産", "year": 1998, "lat": 34.6851, "lon": 135.8048},
+    {"name": "日光の社寺", "region": "関東", "type": "文化遺産", "year": 1999, "lat": 36.7580, "lon": 139.5988},
+    {"name": "琉球王国のグスク及び関連遺産群", "region": "九州・沖縄", "type": "文化遺産", "year": 2000, "lat": 26.2172, "lon": 127.7195},
+    {"name": "紀伊山地の霊場と参詣道", "region": "近畿", "type": "文化遺産", "year": 2004, "lat": 33.8408, "lon": 135.7747},
+    {"name": "知床", "region": "北海道", "type": "自然遺産", "year": 2005, "lat": 44.0692, "lon": 145.1069},
+    {"name": "石見銀山遺跡とその文化的景観", "region": "中国・四国", "type": "文化遺産", "year": 2007, "lat": 35.1072, "lon": 132.4358},
+    {"name": "平泉－仏国土（浄土）を表現する遺跡群", "region": "東北", "type": "文化遺産", "year": 2011, "lat": 39.0017, "lon": 141.1167},
+    {"name": "小笠原諸島", "region": "関東", "type": "自然遺産", "year": 2011, "lat": 27.0933, "lon": 142.1925},
+    {"name": "富士山－信仰の対象と芸術の源泉", "region": "中部", "type": "文化遺産", "year": 2013, "lat": 35.3606, "lon": 138.7274},
+    {"name": "富岡製糸場と絹産業遺産群", "region": "関東", "type": "文化遺産", "year": 2014, "lat": 36.2556, "lon": 138.8875},
+    {"name": "明治日本の産業革命遺産", "region": "九州・沖縄", "type": "文化遺産", "year": 2015, "lat": 32.6278, "lon": 129.7386},
+    {"name": "ル・コルビュジエの建築作品群（国立西洋美術館）", "region": "関東", "type": "文化遺産", "year": 2016, "lat": 35.7155, "lon": 139.7760},
+    {"name": "「神宿る島」宗像・沖ノ島と関連遺産群", "region": "九州・沖縄", "type": "文化遺産", "year": 2017, "lat": 34.2442, "lon": 130.1044},
+    {"name": "長崎と天草地方の潜伏キリシタン関連遺産", "region": "九州・沖縄", "type": "文化遺産", "year": 2018, "lat": 32.7342, "lon": 129.8689},
+    {"name": "百舌鳥・古市古墳群", "region": "近畿", "type": "文化遺産", "year": 2019, "lat": 34.5642, "lon": 135.4872},
+    {"name": "北海道・北東北の縄文遺跡群", "region": "北海道", "type": "文化遺産", "year": 2021, "lat": 40.8647, "lon": 140.6975},
+    {"name": "奄美大島、徳之島、沖縄島北部及び西表島", "region": "九州・沖縄", "type": "自然遺産", "year": 2021, "lat": 26.7311, "lon": 128.2572},
+    {"name": "佐渡島の金山", "region": "中部", "type": "文化遺産", "year": 2024, "lat": 38.0419, "lon": 138.2556},
+]
+
 QUIZ_DATA = [
     {
         "question": "法隆寺地域の仏教建造物が日本で初めて世界遺産に登録された年はいつか。",
