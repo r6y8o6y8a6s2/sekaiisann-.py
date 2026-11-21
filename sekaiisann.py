@@ -22,15 +22,6 @@ st.markdown("""
         margin-bottom: 16px;
         color: #111827;
     }
-    .flashcard {
-        background-color: #ffffff;
-        border: 2px solid #dee2e6;
-        border-radius: 12px;
-        padding: 24px;
-        min-height: 200px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        color: #111827;
-    }
     .correct-box {
         background-color: #d1e7dd;
         border-left: 5px solid #198754;
@@ -75,36 +66,6 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-
-# --- 日本の世界遺産マップデータ ---
-JAPAN_HERITAGE_MAP = [
-    {"name": "法隆寺地域の仏教建造物", "region": "近畿", "type": "文化遺産", "year": 1993, "lat": 34.6146, "lon": 135.7343},
-    {"name": "姫路城", "region": "近畿", "type": "文化遺産", "year": 1993, "lat": 34.8394, "lon": 134.6939},
-    {"name": "白神山地", "region": "東北", "type": "自然遺産", "year": 1993, "lat": 40.4728, "lon": 140.1306},
-    {"name": "屋久島", "region": "九州・沖縄", "type": "自然遺産", "year": 1993, "lat": 30.3597, "lon": 130.5297},
-    {"name": "古都京都の文化財", "region": "近畿", "type": "文化遺産", "year": 1994, "lat": 35.0116, "lon": 135.7681},
-    {"name": "白川郷・五箇山の合掌造り集落", "region": "中部", "type": "文化遺産", "year": 1995, "lat": 36.2725, "lon": 136.8986},
-    {"name": "原爆ドーム", "region": "中国・四国", "type": "文化遺産", "year": 1996, "lat": 34.3955, "lon": 132.4536},
-    {"name": "厳島神社", "region": "中国・四国", "type": "文化遺産", "year": 1996, "lat": 34.2960, "lon": 132.3198},
-    {"name": "古都奈良の文化財", "region": "近畿", "type": "文化遺産", "year": 1998, "lat": 34.6851, "lon": 135.8048},
-    {"name": "日光の社寺", "region": "関東", "type": "文化遺産", "year": 1999, "lat": 36.7580, "lon": 139.5988},
-    {"name": "琉球王国のグスク及び関連遺産群", "region": "九州・沖縄", "type": "文化遺産", "year": 2000, "lat": 26.2172, "lon": 127.7195},
-    {"name": "紀伊山地の霊場と参詣道", "region": "近畿", "type": "文化遺産", "year": 2004, "lat": 33.8408, "lon": 135.7747},
-    {"name": "知床", "region": "北海道", "type": "自然遺産", "year": 2005, "lat": 44.0692, "lon": 145.1069},
-    {"name": "石見銀山遺跡とその文化的景観", "region": "中国・四国", "type": "文化遺産", "year": 2007, "lat": 35.1072, "lon": 132.4358},
-    {"name": "平泉－仏国土（浄土）を表現する遺跡群", "region": "東北", "type": "文化遺産", "year": 2011, "lat": 39.0017, "lon": 141.1167},
-    {"name": "小笠原諸島", "region": "関東", "type": "自然遺産", "year": 2011, "lat": 27.0933, "lon": 142.1925},
-    {"name": "富士山－信仰の対象と芸術の源泉", "region": "中部", "type": "文化遺産", "year": 2013, "lat": 35.3606, "lon": 138.7274},
-    {"name": "富岡製糸場と絹産業遺産群", "region": "関東", "type": "文化遺産", "year": 2014, "lat": 36.2556, "lon": 138.8875},
-    {"name": "明治日本の産業革命遺産", "region": "九州・沖縄", "type": "文化遺産", "year": 2015, "lat": 32.6278, "lon": 129.7386},
-    {"name": "ル・コルビュジエの建築作品群（国立西洋美術館）", "region": "関東", "type": "文化遺産", "year": 2016, "lat": 35.7155, "lon": 139.7760},
-    {"name": "「神宿る島」宗像・沖ノ島と関連遺産群", "region": "九州・沖縄", "type": "文化遺産", "year": 2017, "lat": 34.2442, "lon": 130.1044},
-    {"name": "長崎と天草地方の潜伏キリシタン関連遺産", "region": "九州・沖縄", "type": "文化遺産", "year": 2018, "lat": 32.7342, "lon": 129.8689},
-    {"name": "百舌鳥・古市古墳群", "region": "近畿", "type": "文化遺産", "year": 2019, "lat": 34.5642, "lon": 135.4872},
-    {"name": "北海道・北東北の縄文遺跡群", "region": "北海道", "type": "文化遺産", "year": 2021, "lat": 40.8647, "lon": 140.6975},
-    {"name": "奄美大島、徳之島、沖縄島北部及び西表島", "region": "九州・沖縄", "type": "自然遺産", "year": 2021, "lat": 26.7311, "lon": 128.2572},
-    {"name": "佐渡島の金山", "region": "中部", "type": "文化遺産", "year": 2024, "lat": 38.0419, "lon": 138.2556},
-]
 
 QUIZ_DATA = [
     {
@@ -681,19 +642,8 @@ if "is_mock_exam" not in st.session_state:
     st.session_state.is_mock_exam = False
 if "quiz_results_log" not in st.session_state:
     st.session_state.quiz_results_log = []
-# 暗記カード用
-if "flashcard_index" not in st.session_state:
-    st.session_state.flashcard_index = 0
-if "flashcard_flipped" not in st.session_state:
-    st.session_state.flashcard_flipped = False
-if "mastered_questions" not in st.session_state:
-    st.session_state.mastered_questions = set()
-if "fc_filter_unmastered" not in st.session_state:
-    st.session_state.fc_filter_unmastered = False
-# 忘却曲線スケジュール用（問題文をキーに保存）
 if "forgetting_curve_log" not in st.session_state:
     st.session_state.forgetting_curve_log = {}
-# ストリーク
 if "study_dates" not in st.session_state:
     st.session_state.study_dates = {str(date.today())}
 
@@ -759,58 +709,13 @@ if st.session_state.app_mode == "home":
 
     st.subheader("🎯 学習メニューを選択")
 
-    col_nav1, col_nav2, col_nav3 = st.columns(3)
-    with col_nav1:
-        if st.button("🎓 本番模擬試験", type="primary", use_container_width=True):
-            mock_list = QUIZ_DATA.copy()
-            random.shuffle(mock_list)
-            st.session_state.shuffled_quiz = prepare_quiz_session(mock_list)
-            st.session_state.app_mode = "quiz"
-            st.session_state.mode_label = "🎓 本番模擬試験モード（合格ライン70%）"
-            st.session_state.is_mock_exam = True
-            st.session_state.current_q = 0
-            st.session_state.score = 0
-            st.session_state.wrong_questions = []
-            st.session_state.quiz_results_log = []
-            st.session_state.answered = False
-            st.session_state.selected_option = None
-            st.rerun()
-    with col_nav2:
-        if st.button("📇 暗記カード", use_container_width=True):
-            st.session_state.app_mode = "flashcard"
-            st.session_state.flashcard_index = 0
-            st.session_state.flashcard_flipped = False
-            st.rerun()
-    with col_nav3:
-        if st.button("🗺️ 遺産マップ", use_container_width=True):
-            st.session_state.app_mode = "map"
-            st.rerun()
-
-    st.markdown("---")
-    st.subheader("⚙️ カスタム練習クイズ")
-
-    mode = st.radio(
-        "📝 挑戦する問題数：",
-        ["サクッと10問", "ハーフ20問", "全問網羅"],
-        horizontal=True
-    )
-
-    st.write("")
-
-    if st.button("🚀 カスタムクイズをスタート！", use_container_width=True):
-        filtered_data = QUIZ_DATA.copy()
-        if "10問" in mode:
-            limit = min(10, len(filtered_data))
-        elif "20問" in mode:
-            limit = min(20, len(filtered_data))
-        else:
-            limit = len(filtered_data)
-
-        random.shuffle(filtered_data)
-        st.session_state.shuffled_quiz = prepare_quiz_session(filtered_data[:limit])
+    if st.button("🎓 本番模擬試験をスタート（全問）", type="primary", use_container_width=True):
+        mock_list = QUIZ_DATA.copy()
+        random.shuffle(mock_list)
+        st.session_state.shuffled_quiz = prepare_quiz_session(mock_list)
         st.session_state.app_mode = "quiz"
-        st.session_state.mode_label = "カスタム練習モード"
-        st.session_state.is_mock_exam = False
+        st.session_state.mode_label = "🎓 本番模擬試験モード（合格ライン70%）"
+        st.session_state.is_mock_exam = True
         st.session_state.current_q = 0
         st.session_state.score = 0
         st.session_state.wrong_questions = []
@@ -872,133 +777,7 @@ if st.session_state.app_mode == "home":
             st.rerun()
 
 # ==========================================
-# 2. 🗺️ マップビュワー
-# ==========================================
-elif st.session_state.app_mode == "map":
-    st.subheader("🗺️ 日本の世界遺産 エリア＆マップビュワー")
-    df_map = pd.DataFrame(JAPAN_HERITAGE_MAP)
-
-    regions = ["すべて"] + list(dict.fromkeys(df_map["region"].tolist()))
-    sel_region = st.selectbox("📍 表示する地方エリア：", regions)
-
-    df_filtered = df_map if sel_region == "すべて" else df_map[df_map["region"] == sel_region]
-
-    st.map(df_filtered[["lat", "lon"]])
-    st.dataframe(
-        df_filtered[["name", "region", "type", "year"]].rename(
-            columns={"name": "世界遺産名", "region": "地方", "type": "種別", "year": "登録年"}
-        ),
-        use_container_width=True, hide_index=True
-    )
-
-    if st.button("🏠 ホームに戻る", type="primary", use_container_width=True):
-        st.session_state.app_mode = "home"
-        st.rerun()
-
-# ==========================================
-# 3. 📇 暗記カードモード
-# ==========================================
-elif st.session_state.app_mode == "flashcard":
-    st.subheader("📇 暗記カードモード（音声読み上げ対応）")
-
-    mastered_cnt = len(st.session_state.mastered_questions)
-    total_cnt = len(QUIZ_DATA)
-    st.progress(mastered_cnt / total_cnt if total_cnt > 0 else 0)
-    st.caption(f"習得状況: {mastered_cnt} / {total_cnt} 枚 習得済み")
-
-    filter_unmastered = st.checkbox("🔴 「まだ怪しい」カードだけ表示", value=st.session_state.fc_filter_unmastered)
-    if filter_unmastered != st.session_state.fc_filter_unmastered:
-        st.session_state.fc_filter_unmastered = filter_unmastered
-        st.session_state.flashcard_index = 0
-        st.session_state.flashcard_flipped = False
-        st.rerun()
-
-    fc_list = [q for q in QUIZ_DATA if q["question"] not in st.session_state.mastered_questions] if st.session_state.fc_filter_unmastered else QUIZ_DATA
-
-    if not fc_list:
-        st.success("🎉 すべてのカードを習得しました！")
-        if st.button("🏠 ホームに戻る", type="primary"):
-            st.session_state.app_mode = "home"
-            st.rerun()
-    else:
-        idx = st.session_state.flashcard_index % len(fc_list)
-        card = fc_list[idx]
-        is_mastered = card["question"] in st.session_state.mastered_questions
-        status_badge = "🟢 習得済み" if is_mastered else "🔴 未習得"
-
-        st.markdown(f"**カード {idx+1} / {len(fc_list)}** | {status_badge}")
-
-        speech_text = card['question'] if not st.session_state.flashcard_flipped else f"正解は、{card['answer']}。解説、{card['explanation']}"
-        st.markdown(f"""
-            <script>
-            function speakText() {{
-                const text = "{speech_text}";
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'ja-JP';
-                window.speechSynthesis.speak(utterance);
-            }}
-            </script>
-        """, unsafe_allow_html=True)
-
-        if not st.session_state.flashcard_flipped:
-            st.markdown(f"""
-                <div class="flashcard">
-                    <h3>❓ 問題・テーマ</h3>
-                    <p style="font-size: 1.25em; font-weight: bold; margin-top: 20px;">{card['question']}</p>
-                </div>
-            """, unsafe_allow_html=True)
-
-            col_f_btn1, col_f_btn2 = st.columns(2)
-            with col_f_btn1:
-                if st.button("🔄 答えを見る", type="primary", use_container_width=True):
-                    st.session_state.flashcard_flipped = True
-                    st.rerun()
-            with col_f_btn2:
-                st.markdown('<button onclick="speakText()" style="width:100%; height:40px; border-radius:5px; background-color:#ffc107; border:none; font-weight:bold; cursor:pointer;">🔊 音声で聴く</button>', unsafe_allow_html=True)
-        else:
-            st.markdown(f"""
-                <div class="flashcard">
-                    <h3>🎉 正解・重要ポイント</h3>
-                    <p style="font-size: 1.25em; font-weight: bold; color: #198754; margin-top: 15px;">正解: {card['answer']}</p>
-                    <p style="margin-top: 15px;"><b>解説:</b> {card['explanation']}</p>
-                    <p style="margin-top: 10px; font-size: 0.9em; color: #0d6efd;">📌 {card['tag']}</p>
-                </div>
-            """, unsafe_allow_html=True)
-
-            col_s1, col_s2 = st.columns(2)
-            with col_s1:
-                if st.button("🟢 完璧に覚えた！", use_container_width=True):
-                    st.session_state.mastered_questions.add(card["question"])
-                    st.session_state.flashcard_index = (idx + 1) % max(1, len(fc_list))
-                    st.session_state.flashcard_flipped = False
-                    st.rerun()
-            with col_s2:
-                if st.button("🔴 まだ怪しい…", use_container_width=True):
-                    if card["question"] in st.session_state.mastered_questions:
-                        st.session_state.mastered_questions.remove(card["question"])
-                    st.session_state.flashcard_index = (idx + 1) % max(1, len(fc_list))
-                    st.session_state.flashcard_flipped = False
-                    st.rerun()
-
-        st.write("")
-        col_c1, col_c2, col_c3 = st.columns(3)
-        with col_c1:
-            if st.button("⬅️ 前のカード", use_container_width=True):
-                st.session_state.flashcard_index = (idx - 1) % len(fc_list)
-                st.session_state.flashcard_flipped = False
-                st.rerun()
-        with col_c2:
-            if st.button("🏠 ホームに戻る", use_container_width=True):
-                st.session_state.app_mode = "home"
-                st.rerun()
-        with col_c3:
-            if st.button("次のカード ➡️", use_container_width=True):
-                st.session_state.flashcard_index = (idx + 1) % len(fc_list)
-                st.session_state.flashcard_flipped = False
-                st.rerun()
-
-# ==========================================
-# 4. クイズ・模擬試験プレイ画面
+# 2. クイズ・模擬試験プレイ画面
 # ==========================================
 elif st.session_state.app_mode == "quiz":
     active_quiz = st.session_state.shuffled_quiz
@@ -1099,7 +878,7 @@ elif st.session_state.app_mode == "quiz":
             st.rerun()
 
     # ==========================================
-    # 5. 結果発表画面
+    # 3. 結果発表画面
     # ==========================================
     else:
         total_len = len(active_quiz)
