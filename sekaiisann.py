@@ -706,11 +706,11 @@ if st.session_state.app_mode == "home":
     st.subheader("🎯 学習メニューを選択")
     
     col_nav1, col_nav2, col_nav3 = st.columns(3)
-    with col_nav1:
+   with col_nav1:
         if st.button("🎓 本番模擬試験", type="primary", use_container_width=True):
             mock_list = QUIZ_DATA.copy()
             random.shuffle(mock_list)
-            st.session_state.shuffled_quiz = prepare_quiz_session(mock_list[:min(30, len(mock_list))])
+            st.session_state.shuffled_quiz = prepare_quiz_session(mock_list)
             st.session_state.app_mode = "quiz"
             st.session_state.mode_label = "🎓 本番模擬試験モード（合格ライン70%）"
             st.session_state.is_mock_exam = True
