@@ -1,61 +1,3 @@
-import streamlit as st
-import pandas as pd
-import random
-import re
-import time
-from datetime import datetime, date, timedelta
-
-# ページ設定
-st.set_page_config(
-    page_title="世界遺産 4択マスター（検定2級対策）",
-    page_icon="🏛️",
-    layout="centered"
-)
-
-# --- 💡 カスタムCSS（ライトテーマ固定） ---
-st.markdown("""
-    <style>
-    .correct-box { padding: 15px; border-radius: 8px; background-color: #d1e7dd; color: #0f5132; margin-bottom: 10px; }
-    .incorrect-box { padding: 15px; border-radius: 8px; background-color: #f8d7da; color: #842029; margin-bottom: 10px; }
-    .explanation-box { padding: 15px; border-radius: 8px; background-color: #cfe2ff; color: #084298; margin-bottom: 15px; }
-    .trivia-box { padding: 15px; border-radius: 8px; background-color: #fff3cd; color: #664d03; margin-bottom: 20px; border-left: 5px solid #ffc107; }
-    .flashcard { padding: 30px; border-radius: 12px; background-color: #f8f9fa; border: 2px solid #dee2e6; text-align: center; margin-bottom: 20px; }
-    .pass-banner { padding: 20px; border-radius: 10px; background-color: #d1e7dd; color: #0f5132; text-align: center; border: 2px solid #198754; margin-bottom: 15px; }
-    .fail-banner { padding: 20px; border-radius: 10px; background-color: #f8d7da; color: #842029; text-align: center; border: 2px solid #dc3545; margin-bottom: 15px; }
-    </style>
-""", unsafe_allow_html=True)
-
-# --- 🗺️ 日本の世界遺産 位置データ（マップ表示用） ---
-JAPAN_HERITAGE_MAP = [
-    {"name": "知床", "region": "北海道・東北", "type": "自然遺産", "year": 2005, "lat": 44.0933, "lon": 145.1219},
-    {"name": "北海道・北東北の縄文遺跡群（三内丸山遺跡）", "region": "北海道・東北", "type": "文化遺産", "year": 2021, "lat": 40.8114, "lon": 140.6975},
-    {"name": "白神山地", "region": "北海道・東北", "type": "自然遺産", "year": 1993, "lat": 40.4714, "lon": 140.1303},
-    {"name": "平泉－仏国土（浄土）を表現する建築・庭園及び考古学的遺跡群", "region": "北海道・東北", "type": "文化遺産", "year": 2011, "lat": 39.0014, "lon": 141.1083},
-    {"name": "日光の社寺", "region": "関東", "type": "文化遺産", "year": 1999, "lat": 36.7581, "lon": 139.5989},
-    {"name": "富岡製糸場と絹産業遺産群", "region": "関東", "type": "文化遺産", "year": 2014, "lat": 36.2553, "lon": 138.8878},
-    {"name": "小笠原諸島", "region": "関東", "type": "自然遺産", "year": 2011, "lat": 27.0944, "lon": 142.1917},
-    {"name": "国立西洋美術館（ル・コルビュジエの建築作品）", "region": "関東", "type": "文化遺産", "year": 2016, "lat": 35.7154, "lon": 139.7758},
-    {"name": "佐渡島の金山", "region": "中部", "type": "文化遺産", "year": 2024, "lat": 38.0422, "lon": 138.2589},
-    {"name": "白川郷・五箇山の合掌造り集落", "region": "中部", "type": "文化遺産", "year": 1995, "lat": 36.2569, "lon": 136.9061},
-    {"name": "富士山－信仰の対象と芸術の源泉", "region": "中部", "type": "文化遺産", "year": 2013, "lat": 35.3606, "lon": 138.7274},
-    {"name": "古都京都の文化財", "region": "近畿", "type": "文化遺産", "year": 1994, "lat": 35.0394, "lon": 135.7292},
-    {"name": "古都奈良の文化財", "region": "近畿", "type": "文化遺産", "year": 1998, "lat": 34.6890, "lon": 135.8398},
-    {"name": "法隆寺地域の仏教建造物", "region": "近畿", "type": "文化遺産", "year": 1993, "lat": 34.6142, "lon": 135.7356},
-    {"name": "姫路城", "region": "近畿", "type": "文化遺産", "year": 1993, "lat": 34.8394, "lon": 134.6939},
-    {"name": "紀伊山地の霊場と参詣道", "region": "近畿", "type": "文化遺産", "year": 2004, "lat": 33.8403, "lon": 135.7736},
-    {"name": "百舌鳥・古市古墳群", "region": "近畿", "type": "文化遺産", "year": 2019, "lat": 34.5547, "lon": 135.4875},
-    {"name": "石見銀山遺跡とその文化的景観", "region": "中国・四国", "type": "文化遺産", "year": 2007, "lat": 35.1069, "lon": 132.4367},
-    {"name": "原爆ドーム", "region": "中国・四国", "type": "文化遺産", "year": 1996, "lat": 34.3955, "lon": 132.4536},
-    {"name": "厳島神社", "region": "中国・四国", "type": "文化遺産", "year": 1996, "lat": 34.2961, "lon": 132.3197},
-    {"name": "「神宿る島」宗像・沖ノ島と関連遺産群", "region": "九州・沖縄", "type": "文化遺産", "year": 2017, "lat": 34.2414, "lon": 130.1044},
-    {"name": "明治日本の産業革命遺産（軍艦島など）", "region": "九州・沖縄", "type": "文化遺産", "year": 2015, "lat": 32.6278, "lon": 129.7386},
-    {"name": "長崎と天草地方の潜伏キリシタン関連遺産", "region": "九州・沖縄", "type": "文化遺産", "year": 2018, "lat": 32.7342, "lon": 129.8703},
-    {"name": "屋久島", "region": "九州・沖縄", "type": "自然遺産", "year": 1993, "lat": 30.3586, "lon": 130.5283},
-    {"name": "奄美大島、徳之島、沖縄島北部及び西表島", "region": "九州・沖縄", "type": "自然遺産", "year": 2021, "lat": 28.2931, "lon": 129.3667},
-    {"name": "琉球王国のグスク及び関連遺産群", "region": "九州・沖縄", "type": "文化遺産", "year": 2000, "lat": 26.2170, "lon": 127.7195},
-]
-
-# --- QUIZ_DATA（全34問・全選択肢18文字以内・id/カテゴリー/難易度なし） ---
 QUIZ_DATA = [
     {
         "question": "法隆寺地域の仏教建造物が日本で初めて世界遺産に登録された年はいつか。",
@@ -261,7 +203,8 @@ QUIZ_DATA = [
         "explanation": "正解は「万座環状列石 と 野中堂環状列石」です。縄文時代後期（約4,000年前）につくられた大規模な配石遺構で、共同墓地や祭祀の場としての性格を持っています。",
         "tag": "登録年: 2021年 / 基準(iii)(v) / 大湯環状列石",
         "trivia": "各環状列石の中心と「日時計状組石」を結ぶ線や2つの環の中心を結ぶ線は、夏至の日没方向とほぼ一致するとされています。"
-    },{
+    },
+    {
         "question": "平泉の構成資産「中尊寺」において、1124年に建立され内部に奥州藤原氏三代の遺体などが納められている堂宇はどれか。",
         "options": ["① 金色堂", "② 経蔵", "③ 鳳凰堂", "④ 大日堂"],
         "answer": "① 金色堂",
@@ -429,7 +372,8 @@ QUIZ_DATA = [
         "explanation": "正解は「2014年 / 基準(ii)(iv)」です。19世紀後半から20世紀初頭にかけて生糸の大量生産・品質向上をもたらした技術交流と産業遺産の価値が評価されました。",
         "tag": "登録年: 2014年 / 基準(ii)(iv) / 日本の遺産",
         "trivia": "同じ基準(ii)(iv)を持つ日本の産業系文化遺産には、2015年登録の「明治日本の産業革命遺産」もあります。"
-    },{
+    },
+    {
         "question": "マリの複合遺産「バンディアガラの断崖（ドゴン人の地）」において、ドゴン族の創世神話で万物を創造したとされる最高神は何か。",
         "options": ["① アンマ", "② ノモ", "③ オゴ", "④ レベ"],
         "answer": "① アンマ",
@@ -457,7 +401,8 @@ QUIZ_DATA = [
         "explanation": "正解は「ショナ族」です。ショナ族の祖先が築いた王国の首都として栄え、漆喰を使わず花崗岩を積み上げた大規模な石造建築群が残されています。",
         "tag": "登録年: 1986年 / 基準(i)(iii)(vi) / ジンバブエ",
         "trivia": "「ジンバブエ」はショナ語で「石の家」を意味し、現在の国名の由来にもなっています。"
-    },{
+    },
+    {
         "question": "チリの世界文化遺産「ラパ・ニュイ国立公園（イースター島）」において、巨石像モアイの建造を担ったと伝承される支配階級の集団はどれか。",
         "options": ["① 長耳族", "② 短耳族", "③ ラパ族", "④ マオリ族"],
         "answer": "① 長耳族",
@@ -575,8 +520,8 @@ QUIZ_DATA = [
         "tag": "登録年: 1981年 / 基準(iii)(viii) / オーストラリア",
         "trivia": "最終氷期以降の気候変動で干上がった湖沼群の地層と、人類の適応の歴史が評価された複合遺産です。"
     }
-
 ]
+
 
 # --- ヘルパー関数：選択肢のシャッフル ---
 def prepare_quiz_session(questions_list):
@@ -585,9 +530,9 @@ def prepare_quiz_session(questions_list):
         q_copy = q.copy()
         clean_options = [re.sub(r'^[①②③④]\s*', '', opt) for opt in q_copy["options"]]
         clean_answer = re.sub(r'^[①②③④]\s*', '', q_copy["answer"])
-        
+
         random.shuffle(clean_options)
-        
+
         prefixes = ["①", "②", "③", "④"]
         new_options = []
         new_answer = ""
@@ -596,11 +541,12 @@ def prepare_quiz_session(questions_list):
             new_options.append(labeled_opt)
             if text == clean_answer:
                 new_answer = labeled_opt
-                
+
         q_copy["options"] = new_options
         q_copy["answer"] = new_answer
         prepared.append(q_copy)
     return prepared
+
 
 # --- セッション状態の初期化 ---
 if "app_mode" not in st.session_state:
@@ -694,8 +640,8 @@ st.markdown("---")
 if st.session_state.app_mode == "home":
     if "daily_trivia" not in st.session_state:
         st.session_state.daily_trivia = random.choice(QUIZ_DATA)
-    
-   dt = st.session_state.daily_trivia
+
+    dt = st.session_state.daily_trivia
     st.markdown(f"""
         <div class="trivia-box">
             <b>💡 本日の世界遺産トリビア</b><br>
@@ -704,7 +650,7 @@ if st.session_state.app_mode == "home":
     """, unsafe_allow_html=True)
 
     st.subheader("🎯 学習メニューを選択")
-    
+
     col_nav1, col_nav2, col_nav3 = st.columns(3)
     with col_nav1:
         if st.button("🎓 本番模擬試験", type="primary", use_container_width=True):
@@ -734,15 +680,15 @@ if st.session_state.app_mode == "home":
 
     st.markdown("---")
     st.subheader("⚙️ カスタム練習クイズ")
-    
+
     mode = st.radio(
         "📝 挑戦する問題数：",
         ["サクッと10問", "ハーフ20問", "全問網羅"],
         horizontal=True
     )
-    
+
     st.write("")
-    
+
     if st.button("🚀 カスタムクイズをスタート！", use_container_width=True):
         filtered_data = QUIZ_DATA.copy()
         if "10問" in mode:
@@ -751,7 +697,7 @@ if st.session_state.app_mode == "home":
             limit = min(20, len(filtered_data))
         else:
             limit = len(filtered_data)
-        
+
         random.shuffle(filtered_data)
         st.session_state.shuffled_quiz = prepare_quiz_session(filtered_data[:limit])
         st.session_state.app_mode = "quiz"
@@ -783,7 +729,7 @@ if st.session_state.app_mode == "home":
             st.session_state.answered = False
             st.session_state.selected_option = None
             st.rerun()
-            
+
     with col2:
         bm_count = len(st.session_state.bookmarked_questions)
         if st.button(f"⭐ ブックマーク ({bm_count}問)", disabled=(bm_count == 0), use_container_width=True):
@@ -800,6 +746,7 @@ if st.session_state.app_mode == "home":
             st.session_state.answered = False
             st.session_state.selected_option = None
             st.rerun()
+
     with col3:
         fc_due_list = [q for q in QUIZ_DATA if q["question"] in st.session_state.forgetting_curve_log]
         if st.button(f"🧠 忘却曲線復習 ({len(fc_due_list)}問)", disabled=(len(fc_due_list) == 0), use_container_width=True):
@@ -822,12 +769,12 @@ if st.session_state.app_mode == "home":
 elif st.session_state.app_mode == "map":
     st.subheader("🗺️ 日本の世界遺産 エリア＆マップビュワー")
     df_map = pd.DataFrame(JAPAN_HERITAGE_MAP)
-    
+
     regions = ["すべて"] + list(dict.fromkeys(df_map["region"].tolist()))
     sel_region = st.selectbox("📍 表示する地方エリア：", regions)
-    
+
     df_filtered = df_map if sel_region == "すべて" else df_map[df_map["region"] == sel_region]
-    
+
     st.map(df_filtered[["lat", "lon"]])
     st.dataframe(
         df_filtered[["name", "region", "type", "year"]].rename(
@@ -835,7 +782,7 @@ elif st.session_state.app_mode == "map":
         ),
         use_container_width=True, hide_index=True
     )
-    
+
     if st.button("🏠 ホームに戻る", type="primary", use_container_width=True):
         st.session_state.app_mode = "home"
         st.rerun()
@@ -845,19 +792,19 @@ elif st.session_state.app_mode == "map":
 # ==========================================
 elif st.session_state.app_mode == "flashcard":
     st.subheader("📇 暗記カードモード（音声読み上げ対応）")
-    
+
     mastered_cnt = len(st.session_state.mastered_questions)
     total_cnt = len(QUIZ_DATA)
     st.progress(mastered_cnt / total_cnt if total_cnt > 0 else 0)
     st.caption(f"習得状況: {mastered_cnt} / {total_cnt} 枚 習得済み")
-    
+
     filter_unmastered = st.checkbox("🔴 「まだ怪しい」カードだけ表示", value=st.session_state.fc_filter_unmastered)
     if filter_unmastered != st.session_state.fc_filter_unmastered:
         st.session_state.fc_filter_unmastered = filter_unmastered
         st.session_state.flashcard_index = 0
         st.session_state.flashcard_flipped = False
         st.rerun()
-        
+
     fc_list = [q for q in QUIZ_DATA if q["question"] not in st.session_state.mastered_questions] if st.session_state.fc_filter_unmastered else QUIZ_DATA
 
     if not fc_list:
@@ -870,9 +817,9 @@ elif st.session_state.app_mode == "flashcard":
         card = fc_list[idx]
         is_mastered = card["question"] in st.session_state.mastered_questions
         status_badge = "🟢 習得済み" if is_mastered else "🔴 未習得"
-        
+
         st.markdown(f"**カード {idx+1} / {len(fc_list)}** | {status_badge}")
-        
+
         speech_text = card['question'] if not st.session_state.flashcard_flipped else f"正解は、{card['answer']}。解説、{card['explanation']}"
         st.markdown(f"""
             <script>
@@ -884,7 +831,7 @@ elif st.session_state.app_mode == "flashcard":
             }}
             </script>
         """, unsafe_allow_html=True)
-        
+
         if not st.session_state.flashcard_flipped:
             st.markdown(f"""
                 <div class="flashcard">
@@ -892,7 +839,7 @@ elif st.session_state.app_mode == "flashcard":
                     <p style="font-size: 1.25em; font-weight: bold; margin-top: 20px;">{card['question']}</p>
                 </div>
             """, unsafe_allow_html=True)
-            
+
             col_f_btn1, col_f_btn2 = st.columns(2)
             with col_f_btn1:
                 if st.button("🔄 答えを見る", type="primary", use_container_width=True):
@@ -909,7 +856,7 @@ elif st.session_state.app_mode == "flashcard":
                     <p style="margin-top: 10px; font-size: 0.9em; color: #0d6efd;">📌 {card['tag']}</p>
                 </div>
             """, unsafe_allow_html=True)
-            
+
             col_s1, col_s2 = st.columns(2)
             with col_s1:
                 if st.button("🟢 完璧に覚えた！", use_container_width=True):
@@ -924,7 +871,7 @@ elif st.session_state.app_mode == "flashcard":
                     st.session_state.flashcard_index = (idx + 1) % max(1, len(fc_list))
                     st.session_state.flashcard_flipped = False
                     st.rerun()
-                
+
         st.write("")
         col_c1, col_c2, col_c3 = st.columns(3)
         with col_c1:
@@ -951,15 +898,15 @@ elif st.session_state.app_mode == "quiz":
 
     if st.session_state.current_q < len(active_quiz):
         q = active_quiz[st.session_state.current_q]
-        
+
         TIMELIMIT = 20
         if "start_time" not in st.session_state or st.session_state.get("current_q_tracked") != st.session_state.current_q:
             st.session_state.start_time = time.time()
             st.session_state.current_q_tracked = st.session_state.current_q
-            
+
         elapsed = int(time.time() - st.session_state.start_time)
         remaining = max(0, TIMELIMIT - elapsed)
-        
+
         if remaining == 0 and not st.session_state.answered:
             st.session_state.answered = True
             st.session_state.selected_option = "時間切れ"
@@ -967,7 +914,7 @@ elif st.session_state.app_mode == "quiz":
             if orig_q not in st.session_state.wrong_questions:
                 st.session_state.wrong_questions.append(orig_q)
             st.session_state.forgetting_curve_log[q["question"]] = str(datetime.now())
-            
+
             st.session_state.quiz_results_log.append({
                 "question": q["question"], "user_answer": "時間切れ", "correct_answer": q["answer"],
                 "is_correct": False, "explanation": q["explanation"]
@@ -1000,7 +947,7 @@ elif st.session_state.app_mode == "quiz":
                 if st.button(option, key=f"opt_{i}_{st.session_state.current_q}", use_container_width=True, disabled=st.session_state.answered):
                     st.session_state.answered = True
                     st.session_state.selected_option = option
-                    
+
                     is_correct = (option[:1] == q["answer"][:1])
                     if is_correct:
                         st.session_state.score += 1
@@ -1011,7 +958,7 @@ elif st.session_state.app_mode == "quiz":
                         if orig_q not in st.session_state.wrong_questions:
                             st.session_state.wrong_questions.append(orig_q)
                         st.session_state.forgetting_curve_log[q["question"]] = str(datetime.now())
-                    
+
                     st.session_state.quiz_results_log.append({
                         "question": q["question"], "user_answer": option, "correct_answer": q["answer"],
                         "is_correct": is_correct, "explanation": q["explanation"]
@@ -1026,7 +973,7 @@ elif st.session_state.app_mode == "quiz":
                 st.markdown('<div class="correct-box">🎉 <b>正解です！</b></div>', unsafe_allow_html=True)
             else:
                 st.markdown(f'<div class="incorrect-box">😢 <b>不正解…</b> （あなたの回答: {st.session_state.selected_option}）<br>正解は <b>{q["answer"]}</b> です。</div>', unsafe_allow_html=True)
-            
+
             st.markdown(f"""
                 <div class="explanation-box">
                     <b>💡 解説:</b> {q['explanation']}<br><br>
@@ -1049,7 +996,7 @@ elif st.session_state.app_mode == "quiz":
     else:
         total_len = len(active_quiz)
         accuracy = round((st.session_state.score / total_len) * 100, 1) if total_len > 0 else 0
-        
+
         if st.session_state.is_mock_exam:
             st.header("🎓 本番模擬試験 結果発表")
             if accuracy >= 70.0:
@@ -1070,15 +1017,15 @@ elif st.session_state.app_mode == "quiz":
         else:
             st.balloons()
             st.header("🎊 お疲れ様でした！結果発表")
-            
+
         st.metric(label="獲得スコア / 正答率", value=f"{st.session_state.score} / {total_len} 問正解 ({accuracy}%)")
-        
+
         if not st.session_state.get("history_recorded", False):
             attempt_num = len(st.session_state.history) + 1
             st.session_state.history.append({"回数": f"{attempt_num}回目", "正答率(%)": accuracy})
             st.session_state.study_dates.add(str(date.today()))
             st.session_state.history_recorded = True
-        
+
         st.markdown("---")
         st.subheader("📋 今回の全問レビュー（答え合わせ）")
         for idx, log in enumerate(st.session_state.quiz_results_log):
