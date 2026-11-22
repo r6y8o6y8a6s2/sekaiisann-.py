@@ -4,7 +4,7 @@ from datetime import date, datetime
 import streamlit as st
 
 st.set_page_config(
-    page_title="世界遺産検定 4択マスター",
+    page_title="日本の世界遺産検定 4択マスター",
     page_icon="🏛️",
     layout="centered",
 )
