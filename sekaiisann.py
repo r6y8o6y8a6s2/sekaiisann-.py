@@ -396,7 +396,7 @@ if "study_dates" not in st.session_state:
     st.session_state.study_dates = {str(date.today())}
 
 # タイトル
-st.markdown('<h2 style="font-size: 1.8rem;">🏛️ 世界遺産検定 4択マスター</h2>', unsafe_allow_html=True)
+st.markdown('<h2 style="font-size: 1.8rem;">🏛️ 日本の遺産検定 4択マスター</h2>', unsafe_allow_html=True)
 st.markdown("---")
 
 # ==========================================
